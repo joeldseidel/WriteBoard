@@ -35,5 +35,5 @@
 <!-- the drawing area and magical land: the canvas -->
 <canvas id="canvas"></canvas>
 <!--connection to the client, at the end so canvas is ready-->
-<script src="./js/client.js"></script>
+<script src="js/chat-client.js"></script>
 </body>

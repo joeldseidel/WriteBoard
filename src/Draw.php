@@ -5,19 +5,24 @@ use Ratchet\ConnectionInterface;
 
 class Draw implements MessageComponentInterface{
     protected $clients;
+    private $connectedUsers;
     public function __construct(){
         $this->clients = new \SplObjectStorage;
+        $this->connectedUsers = [];
     }
     public function onOpen(ConnectionInterface $conn){
         $this->clients->attach($conn);
+        $this->connectedUsers[$conn->resourceId] = $conn;
         echo "{$conn->resourceId} connected\n";
     }
     public function onMessage(ConnectionInterface $from, $msg){
-        $request_type = json_decode($msg);
-        if($request_type == "new-path"){
-            //TODO: tell all the clients to start a new path and add to server log
-        } else if($request_type == "update-draw"){
-            //TODO: tell all the clients to update and draw this point
+        //may need to differentiate commands here but probably not
+        //TODO: determine if we need to change the message at all before sending it out
+        $this->sendMessage($msg);
+    }
+    private function sendMessage($message){
+        foreach($this->connectedUsers as $user){
+            $user->send(json_encode($message));
         }
     }
     public function onClose(ConnectionInterface $conn){
