@@ -73,3 +73,40 @@ function formatChatMessage(e){
     messageCount++;
     messageElement.appendTo(chatElement);
 }
+
+var mouseDown = false;
+var canvas = $('#canvas');
+
+canvas.mousedown(function(e){
+    e.preventDefault();
+    mouseDown = true;
+    var mouseLoc = {x : e.pageX, y: e.pageY};
+    startLineDraw(mouseLoc);
+});
+canvas.mousemove(function(e) {
+    e.preventDefault();
+    if (mouseDown) {
+        var mouseLoc = {x: e.pageX, y : e.pageY};
+        lineDraw(mouseLoc);
+    }
+});
+canvas.mouseup(function(e){
+    e.preventDefault();
+    if(mouseDown){
+        mouseDown = false;
+    }
+});
+canvas.mouseleave(function(e){
+    e.preventDefault();
+    if(mouseDown){
+        mouseDown = false;
+    }
+});
+
+function startLineDraw(loc){
+    //init a new line
+}
+
+function lineDraw(loc){
+    //add more points to a line
+}
