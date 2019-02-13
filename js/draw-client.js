@@ -1,4 +1,4 @@
-var canvas = $('#canvas');
+var canvas = document.getElementById("canvas");
 var context = canvas.getContext("2d");
 var tool = 'pen';
 
@@ -17,7 +17,7 @@ drawConn.onopen = function(){
     drawConn.send(JSON.stringify(openArgs));
 };
 drawConn.onmessage = function(e){
-    handleCommand(e);
+    handleCommand(e.data);
 };
 drawConn.onclose = function(e){
     //TODO: tell the server I am leaving so the clients can free up my client mem allocation
@@ -25,49 +25,54 @@ drawConn.onclose = function(e){
 
 var mouseDown = false;
 
-canvas.mousedown(function(e){
+canvas.onmousedown = function(e){
     e.preventDefault();
     mouseDown = true;
     var mouseLoc = {x : e.pageX, y: e.pageY};
     startLineDraw(mouseLoc);
-});
-canvas.mousemove(function(e) {
+};
+canvas.onmousemove = function(e) {
     e.preventDefault();
     if (mouseDown) {
         var mouseLoc = {x: e.pageX, y : e.pageY};
         lineDraw(mouseLoc);
     }
-});
-canvas.mouseup(function(e){
+};
+canvas.onmouseup = function(e){
     e.preventDefault();
+    var mouseLoc = {x : e.pageX, y : e.pageY};
     if(mouseDown){
+        //Stop drawing the current line if the mouse was down
+        stopLineDraw(mouseLoc)
         mouseDown = false;
     }
-});
-canvas.mouseleave(function(e){
+};
+canvas.onmouseout = function(e){
     e.preventDefault();
+    var mouseLoc = {x : e.pageX, y : e.pageY};
     if(mouseDown){
+        //Stop drawing the current line if the mouse was down
+        stopLineDraw(mouseLoc);
         mouseDown = false;
     }
-});
+};
 
 function startLineDraw(loc){
     //The path that needs to be started
     var thisLine;
     if(tool === 'pen'){
         //Start a new pen drawing path
-        thisLine = { color : tool.color, size: tool.size, points: [], type: 'pen'};
-        emitLine(thisLine, loc);
+        thisLine = { color : '#000', size: 1, points: [], type: 'pen'};
+        emitNewLine(thisLine, loc);
     } else if(tool === 'erase') {
         //Start a new eraser drawing path
-        thisLine = { color : 'ffffff', size: tool.size, points: [], type: 'eraser'};
-        emitLine(thisLine, loc);
+        thisLine = { color : '#ffffff', size: 1, points: [], type: 'eraser'};
+        emitNewLine(thisLine, loc);
     }
 }
 
-function emitLine(thisLine, loc){
+function emitNewLine(thisLine, loc){
     //Add the current point to the path array
-    thisLine.push(loc);
     var cmd = {type : "new-path", path : thisLine};
     //Announce that there is a new path
     drawConn.send(JSON.stringify(cmd));
@@ -76,12 +81,31 @@ function emitLine(thisLine, loc){
     drawConn.send(JSON.stringify(cmd));
 }
 
-function lineDraw(loc) {
-    //add more points to a line
+function lineDraw(loc){
+    //Add more points to a line
+    var cmd = {
+        type : "update-draw",
+        point : loc
+    };
+    drawConn.send(JSON.stringify(cmd));
+}
+
+function stopLineDraw(loc){
+    var cmd = {
+        type : "update-draw",
+        point : loc
+    };
+    //Send the final point to the server to be drawn
+    drawConn.send(JSON.stringify(cmd));
+    cmd = {
+        type : "close-path"
+    };
+    //Tell everyone that the line is done
+    drawConn.send(JSON.stringify(cmd));
 }
 
 function handleCommand(e){
-    var drawCmd = JSON.parse(e);
+    var drawCmd = JSON.parse(JSON.parse(e));
     var sendingClient;
     if(drawCmd.type === "new-path"){
         //Get the client corresponding to the sending client
@@ -91,10 +115,11 @@ function handleCommand(e){
     } else if(drawCmd.type === "update-draw") {
         //Draw a point to the client's open path
         sendingClient = clients[drawCmd.id];
-        sendingClient.paths.forEach(function (path) {
+        sendingClient.paths.forEach(function (path, i) {
             if (!path.isDrawn) {
                 //This path needs to be drawn to, is open
-                drawPoint(path, drawCmd.point);
+                drawPoint(path.path, drawCmd.point);
+                sendingClient.paths[i].path.points.push(drawCmd.point);
             }
         });
     } else if(drawCmd.type === "close-path") {
@@ -116,20 +141,23 @@ function drawPoint(path, point){
     //save the canvas context
     context.save();
     //Move the canvas origin according to user viewport
-    context.translate(-viewport.x, viewport.y);
+    //context.translate(-viewport.x, viewport.y);
     //Change the canvas scale to reflect the user viewport zoom
-    context.scale(viewport.scale, viewport.scale);
+    //context.scale(viewport.scale, viewport.scale);
     context.beginPath();
     context.strokeStyle = path.color;
     context.lineWidth = path.size;
     context.lineCap = 'round';
-    if(path.points.length === 0){
+    var points = path.points;
+    if(points.length === 0){
         //This is the first point so just move to its location
         context.moveTo(point.x, point.y);
+        console.log("created a line at " + point.x + ", " + point.y);
     } else {
         //This is not the first point so move to the last drawn points location
         var lastPoint = path.points[path.points.length - 1];
         context.moveTo(lastPoint.x, lastPoint.y);
+        console.log("drew a line from " + lastPoint.x + ", " + lastPoint.y + " to " + point.x + ", " + point.y);
     }
     //Draw the line to the current point
     context.lineTo(point.x, point.y);

@@ -36,4 +36,5 @@
 <canvas id="canvas"></canvas>
 <!--connection to the client, at the end so canvas is ready-->
 <script src="js/chat-client.js"></script>
+<script src="js/draw-client.js"></script>
 </body>
