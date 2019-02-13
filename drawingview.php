@@ -9,7 +9,13 @@
     <title>Boeing Hack-a-thon</title>
 </head>
 <body>
-<div id="chat-view"></div>
+<div id="chat">
+    <div id="chat-view"></div>
+    <div id="chat-controls">
+        <input type="text" id="chat-input">
+        <button type="button" id="send-chat-button">Space Jam</button>
+    </div>
+</div>
 <!-- the drawing area and magical land: the canvas -->
 <canvas id="canvas"></canvas>
 <!--connection to the client, at the end so canvas is ready-->

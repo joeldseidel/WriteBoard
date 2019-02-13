@@ -19,6 +19,22 @@ chatConn.onclose = function(){
     //Send I left the chat message as type event
 };
 
+$(document).ready(function(){
+    var sendChatButton = $('#send-chat-button');
+    var chatInput = $('#chat-input');
+    chatInput.keypress(function (e) {
+        var key = e.which;
+        if(key === 13){
+            sendChatButton.click();
+            return false;
+        }
+    });
+    sendChatButton.click(function(){
+        var msg = chatInput.val();
+        chatConn.send(msg);
+    });
+});
+
 function getUsernameArg(){
     var usernameParam = window.location.search.replace("?", '');
     return usernameParam.replace("username=", '');
