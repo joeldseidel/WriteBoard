@@ -40,7 +40,7 @@ class Chat implements MessageComponentInterface{
             $this->logs[] = array(
                 "user" => $this->connectedUsernames[$from->resourceId],
                 "type" => "event",
-                "msg" => "joined the chat",
+                "msg" => "joined the workspace",
                 "timestamp" => time()
             );
             //Debug in server console output

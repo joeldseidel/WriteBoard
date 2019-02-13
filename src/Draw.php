@@ -16,8 +16,13 @@ class Draw implements MessageComponentInterface{
         echo "{$conn->resourceId} connected\n";
     }
     public function onMessage(ConnectionInterface $from, $msg){
-        //may need to differentiate commands here but probably not
-        //TODO: determine if we need to change the message at all before sending it out
+        //Open the command
+        $msg = json_decode($msg);
+        //add the sender id
+        $msg->id = $from->resourceId;
+        //Close the command
+        $msg = json_encode($msg);
+        //Send the command to connected clients
         $this->sendMessage($msg);
     }
     private function sendMessage($message){

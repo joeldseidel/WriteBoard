@@ -1,17 +1,22 @@
 var mouseDown = false;
 var canvas = $('#canvas');
+var context = canvas.getContext("2d");
 var tool = 'pen';
+
+var clients = [];
 
 var drawConn = new WebSocket("ws://localhost:8080/draw");
 
 drawConn.onopen = function(){
     //TODO: get already existing paths and points
+    var openArgs = { type : "new-client" };
+    drawConn.send(JSON.stringify(openArgs));
 };
 drawConn.onmessage = function(e){
-    handleDraw(e);
+    handleCommand(e);
 };
 drawConn.onclose = function(e){
-    //TODO: nothing? maybe? Not sure yet
+    //TODO: tell the server I am leaving so the clients can free up my client mem allocation
 }
 
 canvas.mousedown(function(e){
@@ -67,4 +72,40 @@ function emitLine(thisLine, loc){
 
 function lineDraw(loc) {
     //add more points to a line
+}
+
+function handleCommand(e){
+    var drawCmd = JSON.parse(e);
+    var sendingClient;
+    if(drawCmd.type === "new-path"){
+        //Get the client corresponding to the sending client
+        sendingClient = clients[drawCmd.id];
+        //Push a new open path to the client path array
+        sendingClient.paths.push({path : drawCmd.path, isDrawn : false});
+    } else if(drawCmd.type === "update-draw") {
+        //Draw a point to the client's open path
+        sendingClient = clients[drawCmd.id];
+        sendingClient.paths.forEach(function (path) {
+            if (!path.isDrawn) {
+                //This path needs to be drawn to, is open
+                drawPoint(path, drawCmd.point);
+            }
+        });
+    } else if(drawCmd.type === "close-path") {
+        //Close an open path of a client, they are done with this line
+        sendingClient = clients[drawCmd.id];
+        sendingClient.paths.forEach(function(path){
+            if(!path.isDrawn){
+                //This is the open path. Close it
+                path.isDrawn = true;
+            }
+        });
+    } else if(drawCmd.type === "new-client") {
+        //Register the new client with the user who just joined
+        clients[drawCmd.id] = { id : drawCmd.id, paths : [] };
+    }
+}
+
+function drawPoint(){
+    //TODO: draw the point that the server just told us to
 }
