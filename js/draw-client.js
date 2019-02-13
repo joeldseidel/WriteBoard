@@ -112,11 +112,30 @@ function handleCommand(e){
     }
 }
 
-function drawPoint(){
-    //TODO: draw the point that the server just told us to
+function drawPoint(path, point){
     //save the canvas context
     context.save();
-    
+    //Move the canvas origin according to user viewport
+    context.translate(-viewport.x, viewport.y);
+    //Change the canvas scale to reflect the user viewport zoom
+    context.scale(viewport.scale, viewport.scale);
+    context.beginPath();
+    context.strokeStyle = path.color;
+    context.lineWidth = path.size;
+    context.lineCap = 'round';
+    if(path.points.length === 0){
+        //This is the first point so just move to its location
+        context.moveTo(point.x, point.y);
+    } else {
+        //This is not the first point so move to the last drawn points location
+        var lastPoint = path.points[path.points.length - 1];
+        context.moveTo(lastPoint.x, lastPoint.y);
+    }
+    //Draw the line to the current point
+    context.lineTo(point.x, point.y);
+    //Update the canvas element
+    context.stroke();
+    context.restore();
 }
 
 function convertToLocalSpace(worldLoc){
