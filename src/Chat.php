@@ -31,6 +31,7 @@ class Chat implements MessageComponentInterface{
                 "msg" => $msg,
                 "timestamp" => time()
             );
+            echo $this->connectedUsernames[$from->resourceId] . ": " . $msg . "\n";
             //Send message to all of the users
             $this->sendMessage(end($this->logs));
         } else {
@@ -42,6 +43,8 @@ class Chat implements MessageComponentInterface{
                 "msg" => "joined the chat",
                 "timestamp" => time()
             );
+            //Debug in server console output
+            echo $this->connectedUsernames[$from->resourceId] . ": " . "joined the chat" . "\n";
             //Alert other users that they joined
             $this->sendMessage(end($this->logs));
         }

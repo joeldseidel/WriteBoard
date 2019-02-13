@@ -1,0 +1,15 @@
+.chat-message {
+    border: 1px solid #e6e6e6;
+}
+.chat-event {
+    font-size: small;
+    color: #737373;
+}
+.chat-body{
+    font-size: medium;
+    color: #0d0d0d;
+}
+.chat-username{
+    font-size: small;
+    color: #737373;
+}
