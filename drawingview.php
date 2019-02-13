@@ -8,6 +8,7 @@
     <title>Boeing Hack-a-thon</title>
 </head>
 <body>
+<div id="chat-view"></div>
 <!-- the drawing area and magical land: the canvas -->
 <canvas id="canvas"></canvas>
 <!--connection to the client, at the end so canvas is ready-->
