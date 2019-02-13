@@ -1,11 +1,15 @@
-var mouseDown = false;
 var canvas = $('#canvas');
 var context = canvas.getContext("2d");
 var tool = 'pen';
 
 var clients = [];
-
 var drawConn = new WebSocket("ws://localhost:8080/draw");
+
+var viewport = {
+    x : 0,
+    y : 0,
+    scale : 1
+};
 
 drawConn.onopen = function(){
     //TODO: get already existing paths and points
@@ -17,7 +21,9 @@ drawConn.onmessage = function(e){
 };
 drawConn.onclose = function(e){
     //TODO: tell the server I am leaving so the clients can free up my client mem allocation
-}
+};
+
+var mouseDown = false;
 
 canvas.mousedown(function(e){
     e.preventDefault();
@@ -108,4 +114,29 @@ function handleCommand(e){
 
 function drawPoint(){
     //TODO: draw the point that the server just told us to
+    //save the canvas context
+    context.save();
+    
+}
+
+function convertToLocalSpace(worldLoc){
+    //TODO: convert the world space to the user's viewport
+    //I don't know if this works, but it probably does
+    var loc = clone(worldLoc);
+    loc.x *= viewport.scale;
+    loc.y *= viewport.scale;
+    loc.x -= viewport.x;
+    loc.y += viewport.y;
+    return loc;
+}
+
+function convertToWorldSpace(localLoc){
+    //TODO: convert the user's viewport to the world space
+    //I also don't know if this one works, but it should
+    var loc = clone(localLoc);
+    loc.x += viewport.x;
+    loc.y -= viewport.y;
+    loc.x /= viewport.scale;
+    loc.y /= viewport.scale;
+    return loc;
 }
