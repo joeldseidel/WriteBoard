@@ -13,6 +13,12 @@ class Draw implements MessageComponentInterface{
         echo "{$conn->resourceId} connected\n";
     }
     public function onMessage(ConnectionInterface $from, $msg){
+        $request_type = json_decode($msg);
+        if($request_type == "new-path"){
+            //TODO: tell all the clients to start a new path and add to server log
+        } else if($request_type == "update-draw"){
+            //TODO: tell all the clients to update and draw this point
+        }
     }
     public function onClose(ConnectionInterface $conn){
         $this->clients->detach($conn);
