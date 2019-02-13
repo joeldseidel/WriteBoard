@@ -2,7 +2,7 @@ body{
     margin: 0;
 }
 .chat-message {
-
+    border-bottom: 1px solid #f2f2f2;
 }
 .chat-event {
     font-size: small;
@@ -11,6 +11,7 @@ body{
 .chat-body{
     font-size: medium;
     color: #0d0d0d;
+    padding-left: 20px;
 }
 .chat-username{
     font-size: small;
@@ -28,7 +29,10 @@ body{
 }
 
 #chat-view{
-    padding: 10px;
+    overflow-y: scroll;
+    padding-left: 20px;
+    padding-right: 20px;
+    height: calc(100% - 60px);
 }
 
 #chat-controls{

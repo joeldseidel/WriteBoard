@@ -32,6 +32,7 @@ $(document).ready(function(){
     sendChatButton.click(function(){
         var msg = chatInput.val();
         chatConn.send(msg);
+        chatInput.val('');
     });
 });
 
