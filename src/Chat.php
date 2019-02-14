@@ -55,6 +55,13 @@ class Chat implements MessageComponentInterface{
         }
     }
     public function onClose(ConnectionInterface $conn){
+        $this->logs[] = array(
+            "user" => $this->connectedUsernames[$conn->resourceId],
+            "type" => "event",
+            "msg" => "left the workspace",
+            "timestamp" => time()
+        );
+        $this->sendMessage(end($this->logs));
         $this->clients->detach($conn);
         echo "{$conn->resourceId} disconnected\n";
     }

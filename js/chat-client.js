@@ -13,10 +13,6 @@ chatConn.onopen = function(){
 
 chatConn.onmessage = function(e){
     formatChatMessage(e);
-}
-
-chatConn.onclose = function(){
-    //TODO: send "has left the change message"
 };
 
 $(document).ready(function(){
