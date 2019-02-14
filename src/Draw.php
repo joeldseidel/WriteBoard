@@ -14,6 +14,15 @@ class Draw implements MessageComponentInterface{
         $this->clients->attach($conn);
         $this->connectedUsers[$conn->resourceId] = $conn;
         echo "{$conn->resourceId} connected\n";
+        //Send to the connected client who is already here
+        $connectedIds = array();
+        foreach($this->connectedUsers as $user){
+            array_push($connectedIds, $user->resourceId);
+        }
+        $welcomeMsg = new \stdClass();
+        $welcomeMsg->type = "welcome";
+        $welcomeMsg->friendsHere = $connectedIds;
+        $this->sendMessage(json_encode($welcomeMsg));
     }
     public function onMessage(ConnectionInterface $from, $msg){
         //Open the command
@@ -26,11 +35,10 @@ class Draw implements MessageComponentInterface{
         //Close the command
         $msg = json_encode($msg);
         //Send the command to connected clients
-        $this->sendMessage($msg, $from);
+        $this->sendMessage($msg);
     }
-    private function sendMessage($message, $from){
+    private function sendMessage($message){
         foreach($this->connectedUsers as $user){
-            echo "Sent new points to " . $user->resourceId . " from " . $from->resourceId . "\n";
             $user->send(json_encode($message));
         }
     }

@@ -134,6 +134,11 @@ function handleCommand(e){
     } else if(drawCmd.type === "new-client") {
         //Register the new client with the user who just joined
         clients[drawCmd.id] = { id : drawCmd.id, paths : [] };
+    } else if(drawCmd.type === "welcome"){
+        //I just joined, who is already here?
+        drawCmd.friendsHere.forEach(function(client){
+            clients[client] = { id : client, paths : []};
+        });
     }
 }
 
