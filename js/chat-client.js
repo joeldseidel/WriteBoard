@@ -1,5 +1,3 @@
-//TODO: implement the magic in here
-
 if(!"WebSocket" in window){
     alert("WebSockets is not supported in this browser");
 }

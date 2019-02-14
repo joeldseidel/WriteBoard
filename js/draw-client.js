@@ -1,3 +1,6 @@
+if(!"WebSocket" in window){
+    alert("WebSockets is not supported in this browser");
+}
 var canvas = document.getElementById("canvas");
 var context = canvas.getContext("2d");
 var tool = 'pen';
@@ -18,9 +21,6 @@ drawConn.onopen = function(){
 };
 drawConn.onmessage = function(e){
     handleCommand(e.data);
-};
-drawConn.onclose = function(e){
-    //TODO: tell the server I am leaving so the clients can free up my client mem allocation
 };
 
 var mouseDown = false;
