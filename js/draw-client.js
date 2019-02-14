@@ -29,7 +29,11 @@ canvas.onmousedown = function(e){
     e.preventDefault();
     mouseDown = true;
     var mouseLoc = {x : e.pageX, y: e.pageY};
-    startLineDraw(mouseLoc);
+    if(e.which === 1){
+        startLineDraw(mouseLoc);
+    } else if(e.which === 3){
+        toggleEditMenu(mouseLoc);
+    }
 };
 canvas.onmousemove = function(e) {
     e.preventDefault();
@@ -225,11 +229,20 @@ $('.tool-option').click(function(){
     tool.type = $(this).data("toolname");
 });
 
-$('#canvas').dblclick(function(){
+function toggleEditMenu(loc){
     var toolEditMenu = $('#tool-edit-menu');
+    var contextMenu;
     toolEditMenu.css("display", "block");
     switch(tool.type){
         case "pen":
+            contextMenu = $('#edit-pen-tool');
             break;
+        case "eraser":
+            contextMenu = $('#edit-eraser-tool');
+            break;
+        default: return;
     }
-});
+    contextMenu.css("display", "block");
+    toolEditMenu.css("bottom", loc.y);
+    toolEditMenu.css("left", loc.x);
+}

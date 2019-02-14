@@ -97,4 +97,6 @@ body{
 
 #tool-edit-menu{
     display: none;
+    position: absolute;
+    border: 1px solid #1f3d7a;
 }
