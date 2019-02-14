@@ -41,8 +41,8 @@ $(document).ready(function(){
     openChat.click(function(){
         var chat = $('#chat');
         var minichat = $('#mini-chat');
-        chat.slideToggle();
         minichat.css("display", "none");
+        chat.slideToggle();
         chatShown = true;
     });
 });

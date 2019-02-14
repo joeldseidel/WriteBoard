@@ -65,3 +65,36 @@ body{
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 }
+
+#toolbox{
+    position: absolute;
+    transform: translate(0, 50%);
+    top: 0;
+    left: 0;
+    background-color: white;
+    border: 1px solid #1f3d7a;
+    padding: 20px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.tool-option{
+    cursor: pointer;
+}
+
+.toolbox-listing{
+    padding: 0;
+    margin: 0;
+}
+
+.toolbox-listing li{
+    list-style-type: none;
+}
+
+.tool-name{
+    text-align: left;
+}
+
+#tool-edit-menu{
+    display: none;
+}

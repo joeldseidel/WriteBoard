@@ -40,7 +40,53 @@
     </div>
 </div>
 <div id="toolbox">
-
+    <div id="tool-select">
+        <ul class="toolbox-listing">
+            <li>
+                <div class="tool-option" data-toolname="pen">
+                    <i class="material-icons">border_color</i>
+                    <p class="tool-name">Pen</p>
+                </div>
+            </li>
+            <li>
+                <div class="tool-option" data-toolname="eraser">
+                    <i class="material-icons">border_clear</i>
+                    <p class="tool-name">Eraser</p>
+                </div>
+            </li>
+            <li>
+                <div class="tool-option" data-toolname="text">
+                    <i class="material-icons">text_fields</i>
+                    <p class="tool-name">Text</p>
+                </div>
+            </li>
+            <li>
+                <div class="tool-option" data-toolname="image">
+                    <i class="material-icons w-100">image</i>
+                    <p class="tool-name">Image</p>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+<div id="tool-edit-menu">
+    <div class="row m-0 p-0" id="edit-pen-tool">
+        <div class="col-4">
+            <div class="tool-edit-option" data-editattr="color">
+                <i class="material-icons">format_color_fill</i>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="tool-edit-option" data-editattr="size">
+                <i class="material-icons">bubble_chart</i>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="tool-edit-option" data-editattr="close">
+                <i class="material-icons">close</i>
+            </div>
+        </div>
+    </div>
 </div>
 <!-- the drawing area and magical land: the canvas -->
 <canvas id="canvas"></canvas>

@@ -3,7 +3,7 @@ if(!"WebSocket" in window){
 }
 var canvas = document.getElementById("canvas");
 var context = canvas.getContext("2d");
-var tool = 'pen';
+var tool = {type : "pen"};
 
 var clients = [];
 var drawConn = new WebSocket("ws://localhost:8080/draw");
@@ -43,7 +43,7 @@ canvas.onmouseup = function(e){
     var mouseLoc = {x : e.pageX, y : e.pageY};
     if(mouseDown){
         //Stop drawing the current line if the mouse was down
-        stopLineDraw(mouseLoc)
+        stopLineDraw(mouseLoc);
         mouseDown = false;
     }
 };
@@ -60,11 +60,11 @@ canvas.onmouseout = function(e){
 function startLineDraw(loc){
     //The path that needs to be started
     var thisLine;
-    if(tool === 'pen'){
+    if(tool.type === "pen"){
         //Start a new pen drawing path
         thisLine = { color : '#000', size: 16, points: [], type: 'pen'};
         emitNewLine(thisLine, loc);
-    } else if(tool === 'erase') {
+    } else if(tool.type === "eraser") {
         //Start a new eraser drawing path
         thisLine = { color : '#ffffff', size: 16, points: [], type: 'eraser'};
         emitNewLine(thisLine, loc);
@@ -220,3 +220,16 @@ function calibrateCanvas(){
 window.onload = function(){
     calibrateCanvas();
 };
+
+$('.tool-option').click(function(){
+    tool.type = $(this).data("toolname");
+});
+
+$('#canvas').dblclick(function(){
+    var toolEditMenu = $('#tool-edit-menu');
+    toolEditMenu.css("display", "block");
+    switch(tool.type){
+        case "pen":
+            break;
+    }
+});
