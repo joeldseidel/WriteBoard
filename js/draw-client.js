@@ -8,6 +8,8 @@ var tool = {type : "pen"};
 var clients = [];
 var drawConn = new WebSocket("ws://localhost:8080/draw");
 
+var toolEditMenuOpen = false;
+
 var viewport = {
     x : 0,
     y : 0,
@@ -30,9 +32,17 @@ canvas.onmousedown = function(e){
     mouseDown = true;
     var mouseLoc = {x : e.pageX, y: e.pageY};
     if(e.which === 1){
-        startLineDraw(mouseLoc);
+        if(toolEditMenuOpen) {
+            toggleEditMenu(mouseLoc);
+        } else {
+            startLineDraw(mouseLoc);
+        }
     } else if(e.which === 3){
-        toggleEditMenu(mouseLoc);
+        if(toolEditMenuOpen){
+            redrawEditMenu(mouseLoc);
+        } else {
+            toggleEditMenu(mouseLoc);
+        }
     }
 };
 canvas.onmousemove = function(e) {
@@ -232,7 +242,6 @@ $('.tool-option').click(function(){
 function toggleEditMenu(loc){
     var toolEditMenu = $('#tool-edit-menu');
     var contextMenu;
-    toolEditMenu.css("display", "block");
     switch(tool.type){
         case "pen":
             contextMenu = $('#edit-pen-tool');
@@ -242,7 +251,22 @@ function toggleEditMenu(loc){
             break;
         default: return;
     }
-    contextMenu.css("display", "block");
-    toolEditMenu.css("bottom", loc.y);
-    toolEditMenu.css("left", loc.x);
+    if(!toolEditMenuOpen){
+        //Tool edit menu is not open, but it needs to be
+        toolEditMenu.css("display", "block");
+        contextMenu.css("display", "block");
+        redrawEditMenu(loc);
+        toolEditMenuOpen = true;
+    } else {
+        //Tool edit menu is open, but it needs to not be
+        toolEditMenu.css("display", "none");
+        contextMenu.css("display", "none");
+        toolEditMenuOpen = false;
+    }
+}
+
+function redrawEditMenu(loc){
+    var toolEditMenu = $('#tool-edit-menu');
+    toolEditMenu.css("top", loc.y - 50);
+    toolEditMenu.css("left", loc.x + 1);
 }

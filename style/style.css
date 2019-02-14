@@ -1,5 +1,6 @@
 body{
     margin: 0;
+    overflow-y: hidden;
 }
 .chat-message {
     border-bottom: 1px solid #f2f2f2;
@@ -98,5 +99,19 @@ body{
 #tool-edit-menu{
     display: none;
     position: absolute;
-    border: 1px solid #1f3d7a;
+    border: 2px solid #1f3d7a;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.tool-edit-option{
+    display: block;
+    cursor: pointer;
+    background-color:white;
+    color: #1f3d7a;
+}
+
+.tool-edit-option:hover{
+    background-color: #1f3d7a;
+    color: white;
 }

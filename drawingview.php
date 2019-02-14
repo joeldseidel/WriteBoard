@@ -69,19 +69,19 @@
         </ul>
     </div>
 </div>
-<div id="tool-edit-menu">
-    <div class="row m-0 p-0" id="edit-pen-tool">
-        <div class="col-4">
-            <div class="tool-edit-option" data-editattr="color">
+<div id="tool-edit-menu" oncontextmenu="return false">
+    <div class="tool-edit-listing">
+        <div class="m-0 p-0">
+            <div class="tool-edit-option w-100" data-editattr="color">
                 <i class="material-icons">format_color_fill</i>
             </div>
         </div>
-        <div class="col-4">
+        <div>
             <div class="tool-edit-option" data-editattr="size">
                 <i class="material-icons">bubble_chart</i>
             </div>
         </div>
-        <div class="col-4">
+        <div>
             <div class="tool-edit-option" data-editattr="close">
                 <i class="material-icons">close</i>
             </div>
@@ -89,7 +89,7 @@
     </div>
 </div>
 <!-- the drawing area and magical land: the canvas -->
-<canvas id="canvas"></canvas>
+<canvas id="canvas" oncontextmenu="return false"></canvas>
 <!--connection to the client, at the end so canvas is ready-->
 <script src="js/chat-client.js"></script>
 <script src="js/draw-client.js"></script>
