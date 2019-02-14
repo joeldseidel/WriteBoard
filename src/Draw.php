@@ -18,15 +18,19 @@ class Draw implements MessageComponentInterface{
     public function onMessage(ConnectionInterface $from, $msg){
         //Open the command
         $msg = json_decode($msg);
+        if($msg->type == "new-path"){
+            echo $from->resourceId . " started a new path\n";
+        }
         //add the sender id
         $msg->id = $from->resourceId;
         //Close the command
         $msg = json_encode($msg);
         //Send the command to connected clients
-        $this->sendMessage($msg);
+        $this->sendMessage($msg, $from);
     }
-    private function sendMessage($message){
+    private function sendMessage($message, $from){
         foreach($this->connectedUsers as $user){
+            echo "Sent new points to " . $user->resourceId . " from " . $from->resourceId . "\n";
             $user->send(json_encode($message));
         }
     }

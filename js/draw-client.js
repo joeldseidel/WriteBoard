@@ -62,11 +62,11 @@ function startLineDraw(loc){
     var thisLine;
     if(tool === 'pen'){
         //Start a new pen drawing path
-        thisLine = { color : '#000', size: 1, points: [], type: 'pen'};
+        thisLine = { color : '#000', size: 16, points: [], type: 'pen'};
         emitNewLine(thisLine, loc);
     } else if(tool === 'erase') {
         //Start a new eraser drawing path
-        thisLine = { color : '#ffffff', size: 1, points: [], type: 'eraser'};
+        thisLine = { color : '#ffffff', size: 16, points: [], type: 'eraser'};
         emitNewLine(thisLine, loc);
     }
 }
@@ -138,29 +138,32 @@ function handleCommand(e){
 }
 
 function drawPoint(path, point){
+    //point = convertToWorldSpace(convertToCanvasSpace(point));
     //save the canvas context
     context.save();
     //Move the canvas origin according to user viewport
     //context.translate(-viewport.x, viewport.y);
     //Change the canvas scale to reflect the user viewport zoom
-    //context.scale(viewport.scale, viewport.scale);
+    context.scale(1, 1);
     context.beginPath();
     context.strokeStyle = path.color;
     context.lineWidth = path.size;
     context.lineCap = 'round';
     var points = path.points;
+    point = convertToCanvasSpace(point.x, point.y);
     if(points.length === 0){
         //This is the first point so just move to its location
-        context.moveTo(point.x, point.y);
+        context.moveTo(point.x + 0.5, point.y + 0.5);
         console.log("created a line at " + point.x + ", " + point.y);
     } else {
         //This is not the first point so move to the last drawn points location
         var lastPoint = path.points[path.points.length - 1];
-        context.moveTo(lastPoint.x, lastPoint.y);
+        lastPoint = convertToCanvasSpace(lastPoint.x, lastPoint.y);
+        context.moveTo(lastPoint.x + 0.5, lastPoint.y + 0.5);
         console.log("drew a line from " + lastPoint.x + ", " + lastPoint.y + " to " + point.x + ", " + point.y);
     }
     //Draw the line to the current point
-    context.lineTo(point.x, point.y);
+    context.lineTo(point.x + 0.5, point.y + 0.5);
     //Update the canvas element
     context.stroke();
     context.restore();
@@ -187,3 +190,28 @@ function convertToWorldSpace(localLoc){
     loc.y /= viewport.scale;
     return loc;
 }
+
+function convertToCanvasSpace(x, y){
+    var offset = $('#canvas').offset();
+    var canvasX = x - offset.left;
+    var canvasY = y - offset.top;
+    return{
+        x : canvasX,
+        y : canvasY
+    };
+}
+
+window.onresize = function(){
+    calibrateCanvas();
+    //TODO: redraw all the lines
+};
+
+function calibrateCanvas(){
+    var localCanvas = $('#canvas')[0];
+    localCanvas.width = window.innerWidth;
+    localCanvas.height = window.innerHeight;
+}
+
+window.onload = function(){
+    calibrateCanvas();
+};
