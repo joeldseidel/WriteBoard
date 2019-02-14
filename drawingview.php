@@ -17,7 +17,7 @@
 <div id="chat">
     <div id="chat-header">
         <div class="row p-0 m-0">
-            <button id="close-chat-button" type="button"><i class="material-icons">close</i></button>
+            <button id="close-chat-button" class="transparent-button" type="button"><i class="material-icons">close</i></button>
         </div>
     </div>
     <div id="chat-view"></div>
@@ -31,6 +31,16 @@
             </div>
         </div>
     </div>
+</div>
+<div id="mini-chat">
+    <div class="row m-0 p-0" id="mini-chat-controls">
+        <button id="open-chat" class="transparent-button" type="button"><i class="material-icons">open_in_browser</i></button>
+        <p id="notifications">000</p>
+        <p>&nbsp;unread messages</p>
+    </div>
+</div>
+<div id="toolbox">
+
 </div>
 <!-- the drawing area and magical land: the canvas -->
 <canvas id="canvas"></canvas>

@@ -4,6 +4,7 @@ if(!"WebSocket" in window){
 var username = getUsernameArg();
 var chatElement = $('#chat-view');
 var chatConn = new WebSocket("ws://localhost:8080/chat");
+var chatShown = true;
 
 chatConn.onopen = function(){
     chatConn.send(username);
@@ -16,6 +17,8 @@ chatConn.onmessage = function(e){
 $(document).ready(function(){
     var sendChatButton = $('#send-chat-button');
     var chatInput = $('#chat-input');
+    var minChat = $('#close-chat-button');
+    var openChat = $('#open-chat');
     chatInput.keypress(function (e) {
         var key = e.which;
         if(key === 13){
@@ -27,6 +30,20 @@ $(document).ready(function(){
         var msg = chatInput.val();
         chatConn.send(msg);
         chatInput.val('');
+    });
+    minChat.click(function(){
+        var chat = $('#chat');
+        var minichat = $('#mini-chat');
+        chat.slideToggle();
+        minichat.css("display", "block");
+        chatShown = false;
+    });
+    openChat.click(function(){
+        var chat = $('#chat');
+        var minichat = $('#mini-chat');
+        chat.slideToggle();
+        minichat.css("display", "none");
+        chatShown = true;
     });
 });
 
