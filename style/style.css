@@ -146,3 +146,34 @@ body{
     color: white;
     font-weight: bold;
 }
+.edit-tool-submenu{
+    position: absolute;
+    display: none;
+}
+.color-option{
+    height: 20px;
+    width: 20px;
+    cursor:pointer;
+    border: 1px solid #333333;
+}
+#size-slider{
+    -webkit-appearance: none;
+    height: 25px;
+}
+#size-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 25px;
+    height: 25px;
+    background: rgba(0,0,0,0.5);
+    cursor: pointer;
+}
+
+#size-slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    background: rgba(0,0,0,0.5);
+    cursor: pointer;
+}
+#size-slider::-webkit-slider-container{
+    background:rgba(0,0,0,0.5);
+}

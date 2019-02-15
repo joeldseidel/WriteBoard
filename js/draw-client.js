@@ -3,7 +3,12 @@ if(!"WebSocket" in window){
 }
 var canvas = document.getElementById("canvas");
 var context = canvas.getContext("2d");
-var tool = {type : "pen"};
+//Define the default tool to be a black pen, normal sized
+var tool = {
+    type : "pen",
+    color : "#000",
+    size : 8
+};
 
 var clients = [];
 var drawConn = new WebSocket("ws://localhost:8080/draw");
@@ -76,7 +81,7 @@ function startLineDraw(loc){
     var thisLine;
     if(tool.type === "pen"){
         //Start a new pen drawing path
-        thisLine = { color : '#000', size: 16, points: [], type: 'pen'};
+        thisLine = { color : tool.color, size: tool.size, points: [], type: 'pen'};
         emitNewLine(thisLine, loc);
     } else if(tool.type === "eraser") {
         //Start a new eraser drawing path
@@ -239,6 +244,19 @@ $('.tool-option').click(function(){
     tool.type = $(this).data("toolname");
 });
 
+$('.tool-edit-option').click(function(){
+    var editAttr = $(this).data("editattr");
+    //Close any others that might be open before opening a new one
+    $('.edit-tool-submenu').css("display", "none");
+    if(editAttr === "close"){
+        //They clicked the close button, just close everything and move on
+        toggleEditMenu({x:0,y:0});
+    } else {
+        //The user selected a sub menu
+        handleEditTool(editAttr);
+    }
+});
+
 function toggleEditMenu(loc){
     var toolEditMenu = $('#tool-edit-menu');
     var contextMenu;
@@ -261,6 +279,8 @@ function toggleEditMenu(loc){
         //Tool edit menu is open, but it needs to not be
         toolEditMenu.css("display", "none");
         contextMenu.css("display", "none");
+        //Close any open sub menus
+        $('.edit-tool-submenu').css("display", "none");
         toolEditMenuOpen = false;
     }
 }
@@ -269,4 +289,36 @@ function redrawEditMenu(loc){
     var toolEditMenu = $('#tool-edit-menu');
     toolEditMenu.css("top", loc.y - 50);
     toolEditMenu.css("left", loc.x + 1);
+    redrawEditTool();
 }
+
+function redrawEditTool(){
+    var editTool = $('.edit-tool-submenu');
+    var toolEditMenu = $('#tool-edit-menu');
+    editTool.css("top", toolEditMenu.position().top);
+    editTool.css("left", (toolEditMenu.position().left + toolEditMenu.width() + 25));
+}
+
+function handleEditTool(attr){
+    if(tool.type === "pen"){
+        if(attr === "color"){
+            $('#color-options').css("display", "block");
+            redrawEditTool();
+        } else if(attr === "size") {
+            $('#size-options').css("display", "block");
+        }
+    }
+}
+
+$('.color-option').click(function(){
+    tool.color = $(this).data("color");
+    //Close the color options menu
+    $('#color-options').css("display", "none");
+    toggleEditMenu({x: 0, y: 0});
+});
+//This is hacked up but somehow works :)
+$(document).on('change', '#size-slider', function(){
+    tool.size = $(this).val();
+    $('#size-options').css("display", "none");
+    toggleEditMenu({x: 0, y: 0});
+});

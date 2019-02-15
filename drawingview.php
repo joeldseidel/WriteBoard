@@ -87,6 +87,19 @@
         </div>
     </div>
 </div>
+<div id="color-options" class="edit-tool-submenu">
+    <div class="color-option" data-color="#000000" style="background-color:rgba(0, 0, 0, 0.9)"></div>
+    <div class="color-option" data-color="#003399" style="background-color:rgba(0, 51, 153, 0.9)"></div>
+    <div class="color-option" data-color="#660066" style="background-color:rgba(102, 0, 102, 0.9)"></div>
+    <div class="color-option" data-color="#ff0000" style="background-color:rgba(255, 0, 0, 0.9)"></div>
+    <div class="color-option" data-color="#ff8000" style="background-color:rgba(255, 128, 0, 0.9)"></div>
+    <div class="color-option" data-color="#ffff00" style="background-color:rgba(255, 255, 0, 0.9)"></div>
+    <div class="color-option" data-color="#006600" style="background-color:rgba(0, 102, 0, 0.9)"></div>
+    <div class="color-option" data-color="#ffffff" style="background-color:rgba(255, 255, 255, 0.9)"></div>
+</div>
+<div id="size-options" class="edit-tool-submenu">
+    <input type="range" min="2" max="32" value="8" step="2" id="size-slider" orient="vertical"/>
+</div>
 <!-- the drawing area and magical land: the canvas -->
 <canvas id="canvas" oncontextmenu="return false"></canvas>
 <!--connection to the client, at the end so canvas is ready-->
