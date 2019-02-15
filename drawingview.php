@@ -69,7 +69,7 @@
     </div>
 </div>
 <div id="tool-edit-menu" oncontextmenu="return false">
-    <div class="tool-edit-listing">
+    <div class="tool-edit-listing" id="edit-pen-tool">
         <div class="m-0 p-0">
             <div class="tool-edit-option w-100" data-editattr="color">
                 <i class="material-icons">format_color_fill</i>
