@@ -35,8 +35,7 @@
 <div id="mini-chat">
     <div class="row m-0 p-0" id="mini-chat-controls">
         <button id="open-chat" class="transparent-button" type="button"><i class="material-icons">open_in_browser</i></button>
-        <p id="notifications">000</p>
-        <p>&nbsp;unread messages</p>
+        <p id="notifications"></p>
     </div>
 </div>
 <div id="toolbox">

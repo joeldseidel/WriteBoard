@@ -43,18 +43,23 @@ $(document).ready(function(){
         var minichat = $('#mini-chat');
         minichat.css("display", "none");
         chat.slideToggle();
+        unreadMessageCount = 0;
+        updateUnread();
         chatShown = true;
     });
 });
 
 function getUsernameArg(){
     var usernameParam = window.location.search.replace("?", '');
-    return usernameParam.replace("username=", '');
+    usernameParam = usernameParam.replace("username=", '');
+    usernameParam = usernameParam.replace("%20", ' ');
+    return usernameParam;
 }
 
 //Initially -1 because the first "message" from the server is the chat log
 //Therefore after receiving the logs, there will be 0 messages in the chat
 var messageCount = -1;
+var unreadMessageCount = 0;
 
 function formatChatMessage(e){
     var message = JSON.parse(e.data);
@@ -81,6 +86,20 @@ function formatChatMessage(e){
         textElement.text(message.msg);
         textElement.appendTo(messageElement);
     }
+    if(!chatShown){
+        unreadMessageCount++;
+        updateUnread();
+    }
     messageCount++;
     messageElement.appendTo(chatElement);
+}
+
+function updateUnread(){
+    var notification = $('#notifications');
+    if(unreadMessageCount === 0){
+        notification.text("");
+    } else {
+        var out = unreadMessageCount + " unread message" + (unreadMessageCount > 1 ? "s" : "");
+        notification.text(out);
+    }
 }

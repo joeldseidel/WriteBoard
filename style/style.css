@@ -64,7 +64,11 @@ body{
     height: 5%;
     background-color: #333333;
     border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+}
+
+#open-chat{
+    color: white;
+    height: 100%;
 }
 
 #toolbox{
@@ -124,4 +128,9 @@ body{
 .tool-edit-option:hover{
     background-color: #cccccc;
     color: white;
+}
+
+#notifications{
+    color: white;
+    font-weight: bold;
 }
