@@ -99,7 +99,6 @@ function updateUnread(){
     if(unreadMessageCount === 0){
         notification.text("");
     } else {
-        var out = unreadMessageCount + " unread message" + (unreadMessageCount > 1 ? "s" : "");
-        notification.text(out);
+        notification.text(unreadMessageCount + " unread");
     }
 }
