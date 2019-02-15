@@ -85,7 +85,7 @@ function startLineDraw(loc){
         emitNewLine(thisLine, loc);
     } else if(tool.type === "eraser") {
         //Start a new eraser drawing path
-        thisLine = { color : '#ffffff', size: 16, points: [], type: 'eraser'};
+        thisLine = { color : '#ffffff', size: tool.size, points: [], type: 'eraser'};
         emitNewLine(thisLine, loc);
     }
 }
@@ -300,6 +300,7 @@ function redrawEditTool(){
 }
 
 function handleEditTool(attr){
+    //Someone clicked an option within
     if(tool.type === "pen"){
         if(attr === "color"){
             $('#color-options').css("display", "block");
@@ -307,6 +308,20 @@ function handleEditTool(attr){
         } else if(attr === "size") {
             $('#size-options').css("display", "block");
         }
+    } else if(tool.type === "eraser"){
+        //Don't need to adjust the color of the eraser because it is always white
+        if(attr === "size"){
+
+            $('#size-options').css("display", "block");
+        }
+    } else if(tool.type === "text"){
+        if(attr === "color"){
+            $('#color-options').css("display", "block");
+            redrawEditTool();
+        } else if(attr === "size"){
+            $('#size-options').css("display", "block");
+        }
+    } else if(tool.type === "image"){
     }
 }
 
