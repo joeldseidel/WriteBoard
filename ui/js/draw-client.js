@@ -75,7 +75,9 @@ canvas.onmouseout = function(e){
         mouseDown = false;
     }
 };
-
+canvas.addEventListener("wheel", function(e){
+    handleScale(e);
+});
 function startLineDraw(loc){
     //The path that needs to be started
     var thisLine;
@@ -161,12 +163,79 @@ function handleCommand(e){
     }
 }
 
+var zoomSensitivity = 0.008;
+
+function handleScale(e){
+    var normalized;
+    if(e.wheelDelta){
+        normalized = (e.wheelDelta % 120) === 0 ? e.wheelDelta / 120 : e.wheelDelta / 12;
+    } else {
+        var delta = e.deltaY ? e.deltaY : e.detail;
+        normalized = -(delta % 3 ? delta * 10 : delta / 3);
+    }
+    var point = {
+        x: e.pageX,
+        y: e.pageY
+    };
+    var canvasPoint = convertLocalToCanvasSpace(point);
+    var worldPoint = convertCanvasToWorldSpace(canvasPoint);
+    normalized *= zoomSensitivity;
+    normalized += 1;
+    if(normalized > 0){
+        viewport.scale /= normalized;
+    } else {
+        viewport.scale *= normalized;
+    }
+    var scaledCanvasPoint = convertWorldToCanvasSpace(worldPoint);
+    var pointDelta = {
+        x: canvasPoint.x - scaledCanvasPoint.x,
+        y: canvasPoint.y - scaledCanvasPoint
+    };
+    viewport.x -= pointDelta.x;
+    viewport.y += pointDelta.y;
+    redrawCanvas();
+}
+
+function redrawCanvas(){
+    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+    //Redraw everything from every client
+    //TODO: ensure that this actually works from a performance standpoint
+    //Redraw the paths of every client
+    clients.forEach(function(client){
+        //Redraw every one of this client's paths
+        client.paths.forEach(function(path){
+            //Redraw every point in this path
+            context.save();
+            context.translate(-viewport.x, viewport.y);
+            //TODO: implement the canvas scale
+            context.beginPath();
+            context.strokeStyle = path.color;
+            context.lineWidth = path.size;
+            context.lineCap = 'round';
+            path.points.forEach(function(point, i){
+                point = convertLocalToCanvasSpace(point.x, point.y);
+                if(i === 0){
+                    //This is the first point in this line
+                    context.moveTo(point.x + 0.5, point.y + 0.5);
+                } else {
+                    var lastPoint = path.points[i - 1];
+                    lastPoint = convertLocalToCanvasSpace(lastPoint.x, lastPoint.y);
+                    context.moveTo(lastPoint.x + 0.5, lastPoint.y + 0.5);
+                }
+                context.lineTo(point.x, point.y);
+                context.stroke();
+                context.restore();
+            });
+        });
+    });
+}
+
 function drawPoint(path, point){
-    //point = convertToWorldSpace(convertToCanvasSpace(point));
+    point = convertWorldToLocalSpace(point);
     //save the canvas context
     context.save();
     //Move the canvas origin according to user viewport
-    //context.translate(-viewport.x, viewport.y);
+    context.translate(-viewport.x, viewport.y);
     //Change the canvas scale to reflect the user viewport zoom
     context.scale(1, 1);
     context.beginPath();
@@ -174,7 +243,7 @@ function drawPoint(path, point){
     context.lineWidth = path.size;
     context.lineCap = 'round';
     var points = path.points;
-    point = convertToCanvasSpace(point.x, point.y);
+    point = convertLocalToCanvasSpace(point.x, point.y);
     if(points.length === 0){
         //This is the first point so just move to its location
         context.moveTo(point.x + 0.5, point.y + 0.5);
@@ -182,7 +251,7 @@ function drawPoint(path, point){
     } else {
         //This is not the first point so move to the last drawn points location
         var lastPoint = path.points[path.points.length - 1];
-        lastPoint = convertToCanvasSpace(lastPoint.x, lastPoint.y);
+        lastPoint = convertLocalToCanvasSpace(lastPoint.x, lastPoint.y);
         context.moveTo(lastPoint.x + 0.5, lastPoint.y + 0.5);
         console.log("drew a line from " + lastPoint.x + ", " + lastPoint.y + " to " + point.x + ", " + point.y);
     }
@@ -193,7 +262,7 @@ function drawPoint(path, point){
     context.restore();
 }
 
-function convertToLocalSpace(worldLoc){
+function convertWorldToLocalSpace(worldLoc){
     //TODO: convert the world space to the user's viewport
     //I don't know if this works, but it probably does
     var loc = clone(worldLoc);
@@ -204,7 +273,7 @@ function convertToLocalSpace(worldLoc){
     return loc;
 }
 
-function convertToWorldSpace(localLoc){
+function convertCanvasToWorldSpace(localLoc){
     //TODO: convert the user's viewport to the world space
     //I also don't know if this one works, but it should
     var loc = clone(localLoc);
@@ -215,14 +284,23 @@ function convertToWorldSpace(localLoc){
     return loc;
 }
 
-function convertToCanvasSpace(x, y){
+function convertLocalToCanvasSpace(localLoc){
     var offset = $('#canvas').offset();
-    var canvasX = x - offset.left;
-    var canvasY = y - offset.top;
+    var canvasX = localLoc.x - offset.left;
+    var canvasY = localLoc.y - offset.top;
     return{
         x : canvasX,
         y : canvasY
     };
+}
+
+function convertWorldToCanvasSpace(worldLoc){
+    var point = clone(worldLoc);//See above. This really *** pisses me off.
+    point.x*=viewport.scale;
+    point.y*=viewport.scale;
+    point.x-=viewport.x;
+    point.y+=viewport.y;
+    return point;
 }
 
 window.onresize = function(){
@@ -242,6 +320,9 @@ window.onload = function(){
 
 $('.tool-option').click(function(){
     tool.type = $(this).data("toolname");
+    if(toolEditMenuOpen){
+        toggleEditMenu({x:0, y:0});
+    }
 });
 
 $('.tool-edit-option').click(function(){
@@ -281,6 +362,7 @@ function toggleEditMenu(loc){
         contextMenu.css("display", "none");
         //Close any open sub menus
         $('.edit-tool-submenu').css("display", "none");
+        $('.tool-edit-option').css("display", "none");
         toolEditMenuOpen = false;
     }
 }

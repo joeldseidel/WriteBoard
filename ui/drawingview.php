@@ -86,6 +86,16 @@
             </div>
         </div>
     </div>
+    <div class="tool-edit-listing" id="edit-eraser-tool">
+        <div class="m-0 p-0">
+            <div class="tool-edit-option" data-editattr="size">
+                <i class="material-icons">bubble_chart</i>
+            </div>
+            <div class="tool-edit-option" data-editattr="close">
+                <i class="material-icons">close</i>
+            </div>
+        </div>
+    </div>
 </div>
 <div id="color-options" class="edit-tool-submenu">
     <div class="color-option" data-color="#000000" style="background-color:rgba(0, 0, 0, 0.9)"></div>

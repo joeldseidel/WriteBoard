@@ -150,6 +150,9 @@ body{
     position: absolute;
     display: none;
 }
+.tool-edit-listing{
+    display: none;
+}
 .color-option{
     height: 20px;
     width: 20px;
