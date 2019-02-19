@@ -180,3 +180,9 @@ body{
 #size-slider::-webkit-slider-container{
     background:rgba(0,0,0,0.5);
 }
+
+#text-tool{
+    position: absolute;
+    width: 300px;
+    display: none;
+}

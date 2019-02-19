@@ -38,6 +38,9 @@
         <p id="notifications"></p>
     </div>
 </div>
+<div id="text-tool">
+    <input class = "w-100" type="text" id="text-input">
+</div>
 <div id="toolbox">
     <div id="tool-select">
         <ul class="toolbox-listing">

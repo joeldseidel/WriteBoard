@@ -104,6 +104,8 @@ function startLineDraw(loc){
         //Start a new eraser drawing path
         thisLine = { color : '#ffffff', size: relSize, points: [], type: 'eraser'};
         emitNewLine(thisLine, loc);
+    } else if(tool.type === "text"){
+        toggleTextTool(loc);
     }
 }
 
@@ -138,6 +140,37 @@ function stopLineDraw(loc){
     };
     //Tell everyone that the line is done
     drawConn.send(JSON.stringify(cmd));
+}
+
+var textToolOpen = false;
+
+//Toggle the text tool
+//isRedraw - does the user want it closed or just to move it?
+function toggleTextTool(point, isRedraw){
+    var textTool = $('#text-tool');
+    var textEntry = $('#text-input');
+    if(!textToolOpen){
+        //Open the text tool
+        textTool.css("display", "block");
+        textEntry.css("display", "block");
+        redrawTextTool(point);
+    } else {
+        //Text tool is open, determine what to do with it
+        if(isRedraw){
+            //User wants to move the text entry to a new place
+            redrawTextTool(point);
+        } else {
+            //User wants the text entry box gone
+            textTool.css("display", "none");
+            textEntry.css("display", "none");
+        }
+    }
+}
+
+function redrawTextTool(point){
+    var textTool = $('#text-tool');
+    textTool.css("top", point.y);
+    textTool.css("right", point.x + 1);
 }
 
 function handleCommand(e){
@@ -220,13 +253,6 @@ function redrawCanvas(){
     clients.forEach(function(client){
         //Redraw every one of this client's paths
         client.paths.forEach(function(path){
-            //Decide if its even worth drawing this at the scale we are at
-            var relScale = path.path.size * viewport.scale;
-            console.log(relScale);
-            if(relScale < 1 && path.path.type !== 'eraser'){
-                //too small to bother
-                return;
-            }
             //Redraw every point in this path
             context.beginPath();
             context.strokeStyle = path.path.color;
@@ -241,8 +267,8 @@ function redrawCanvas(){
                     context.moveTo(lastPoint.x + 0.5, lastPoint.y + 0.5);
                 }
                 context.lineTo(point.x, point.y);
-                context.stroke();
             });
+            context.stroke();
         });
     });
     context.restore();
@@ -322,7 +348,7 @@ function clone(obj){
 
 window.onresize = function(){
     calibrateCanvas();
-    //TODO: redraw all the lines
+    redrawCanvas();
 };
 
 function calibrateCanvas(){
