@@ -223,7 +223,7 @@ function redrawCanvas(){
             //Decide if its even worth drawing this at the scale we are at
             var relScale = path.path.size * viewport.scale;
             console.log(relScale);
-            if(relScale < 1){
+            if(relScale < 1 && path.path.type !== 'eraser'){
                 //too small to bother
                 return;
             }
@@ -333,6 +333,7 @@ function calibrateCanvas(){
 
 window.onload = function(){
     calibrateCanvas();
+    redrawCanvas();
 };
 
 $('.tool-option').click(function(){
@@ -371,6 +372,7 @@ function toggleEditMenu(loc){
         //Tool edit menu is not open, but it needs to be
         toolEditMenu.css("display", "block");
         contextMenu.css("display", "block");
+        contextMenu.find(".tool-edit-option").css("display", "block");
         redrawEditMenu(loc);
         toolEditMenuOpen = true;
     } else {
