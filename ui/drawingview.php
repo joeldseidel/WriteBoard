@@ -48,6 +48,16 @@
         </div>
     </div>
 </div>
+<div id="image-tool">
+    <div class="row m-0 p-0">
+        <div class="col-8 m-0 p-0">
+            <input class="w-100" type="file" id="image-input">
+        </div>
+        <div class="col-4 m-0 p-0">
+            <button type="button" class="w-100" id="upload-image-button">Post</button>
+        </div>
+    </div>
+</div>
 <div id="toolbox">
     <div id="tool-select">
         <ul class="toolbox-listing">

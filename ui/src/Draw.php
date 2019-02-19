@@ -27,9 +27,6 @@ class Draw implements MessageComponentInterface{
     public function onMessage(ConnectionInterface $from, $msg){
         //Open the command
         $msg = json_decode($msg);
-        if($msg->type == "new-path"){
-            echo $from->resourceId . " started a new path\n";
-        }
         //add the sender id
         $msg->id = $from->resourceId;
         //Close the command

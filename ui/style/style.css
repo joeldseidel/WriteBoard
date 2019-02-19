@@ -189,3 +189,16 @@ body{
     padding: 10px;
     border-radius: 10px;
 }
+
+#image-tool{
+    position:absolute;
+    width: 400px;
+    display: none;
+    background-color: rgba(0,0,0,0.75);
+    padding: 10px;
+    border-radius: 10px;
+}
+
+#image-input{
+    color: white;
+}

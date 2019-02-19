@@ -105,7 +105,10 @@ function startLineDraw(loc){
         thisLine = { color : '#ffffff', size: relSize, points: [], type: 'eraser'};
         emitNewLine(thisLine, loc);
     } else if(tool.type === "text"){
+        //FIXME: the text tool location is sometimes very wrong ~ this is because of acting on world space not local space
         toggleTextTool(loc);
+    } else if(tool.type === "image"){
+        toggleImageTool(loc);
     }
 }
 
@@ -146,6 +149,7 @@ var textToolOpen = false;
 
 //Toggle the text tool
 //isRedraw - does the user want it closed or just to move it?
+//FIXME: get rid of isredraw, i don't remember what it was supposed to mean
 function toggleTextTool(point, isRedraw){
     var textTool = $('#text-tool');
     var textEntry = $('#text-input');
@@ -170,6 +174,33 @@ function toggleTextTool(point, isRedraw){
     }
 }
 
+var imageToolOpen = false;
+
+function toggleImageTool(point){
+    var imageTool = $('#image-tool');
+    var imageEntry = $('#image-input');
+    if(!imageToolOpen){
+        //Open the image tool
+        imageTool.css("display", "block");
+        imageEntry.css("display", "block");
+        redrawImageTool(point);
+        imageToolOpen = true;
+    } else {
+        //Close the image tool
+        imageTool.css("display", "none");
+        imageEntry.css("display", "none");
+        imageToolOpen = false;
+    }
+}
+
+//TODO: combine the redraw tool functions maybe?
+function redrawImageTool(point){
+    //Reposition the image tool to be where the user clicked
+    var imageTool = $('#image-tool');
+    imageTool.css("top", point.y);
+    imageTool.css("left", point.x + 1);
+}
+
 function redrawTextTool(point){
     var textTool = $('#text-tool');
     textTool.css("top", point.y);
@@ -184,19 +215,43 @@ $('#enter-text-tool').click(function(){
         return;
     }
     var relSize = tool.size / viewport.scale;
-    var props = {color : tool.color, size : relSize, type: 'text'};
-    var point = {
+    var point = convertLocalToWorldSpace({
         x : textTool.position().left,
         y : textTool.position().top
-    };
+    });
+    var props = {color : tool.color, size : relSize, type: 'text', point : point, val : textInput};
     var cmd = {
         type : "new-text",
-        val : textInput,
-        props : props,
-        point : point
+        props : props
     };
     drawConn.send(JSON.stringify(cmd));
     toggleTextTool({x:0,y:0}, false);
+});
+
+$('#upload-image-button').click(function(){
+    var imageTool = $('#image-tool');
+    var imageEntry = $('#image-input').prop("files")[0];
+    var imageReader = new FileReader();
+    if(imageEntry){
+        imageReader.readAsDataURL(imageEntry);
+    } else {
+        alert("Could not upload this image");
+        return;
+    }
+    var image = imageReader.result;
+    //TODO: size preview
+    var relSize = tool.size / viewport.scale;
+    var point = convertLocalToWorldSpace({
+        x: imageTool.position().x,
+        y: imageTool.position().y
+    });
+    var props = {color: tool.color, size: relSize, type: "image", point: point, data: image};
+    var cmd = {
+        type : "new-image",
+        props : props
+    };
+    drawConn.send(JSON.stringify(cmd));
+    toggleImageTool({x:0, y:0});
 });
 
 function handleCommand(e){
@@ -235,11 +290,17 @@ function handleCommand(e){
             clients[client] = { id : client, paths : []};
         });
     } else if(drawCmd.type === "new-text"){
-        drawText(drawCmd.val, drawCmd.props, drawCmd.point);
+        sendingClient = clients[drawCmd.id];
+        drawText(drawCmd.props);
+        var textToolRecord = {
+            path: drawCmd.props,
+            isDrawn: true
+        };
+        sendingClient.paths.push(textToolRecord);
     }
 }
 
-var zoomSensitivity = 0.008;
+var zoomSensitivity = 0.01;
 
 function handleScale(e){
     var normalized;
@@ -273,7 +334,6 @@ function handleScale(e){
 }
 
 function redrawCanvas(){
-    //FIXME: does not redraw text!
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
     context.save();
     context.translate(-viewport.x, viewport.y);
@@ -282,22 +342,33 @@ function redrawCanvas(){
     clients.forEach(function(client){
         //Redraw every one of this client's paths
         client.paths.forEach(function(path){
-            //Redraw every point in this path
-            context.beginPath();
-            context.strokeStyle = path.path.color;
-            context.lineWidth = path.path.size;
-            context.lineCap = 'round';
-            path.path.points.forEach(function(point, i){
-                if(i === 0){
-                    //This is the first point in this line
-                    context.moveTo(point.x + 0.5, point.y + 0.5);
-                } else {
-                    var lastPoint = path.path.points[i - 1];
-                    context.moveTo(lastPoint.x + 0.5, lastPoint.y + 0.5);
-                }
-                context.lineTo(point.x, point.y);
-            });
-            context.stroke();
+            //FIXME: redraw sequencing?
+            if (path.path.type === "text"){
+                context.font = path.path.size.toString() + 'px serif';
+                context.fillStyle = path.path.color;
+                context.fillText(path.path.val, path.path.point.x, path.path.point.y);
+                context.stroke();
+            } else if (path.path.type === "image"){
+                //TODO: implement the image tool
+            } else {
+                //This is a pen or eraser, draw it like a line, nothing special
+                //Redraw every point in this path
+                context.beginPath();
+                context.strokeStyle = path.path.color;
+                context.lineWidth = path.path.size;
+                context.lineCap = 'round';
+                path.path.points.forEach(function(point, i){
+                    if(i === 0){
+                        //This is the first point in this line
+                        context.moveTo(point.x + 0.5, point.y + 0.5);
+                    } else {
+                        var lastPoint = path.path.points[i - 1];
+                        context.moveTo(lastPoint.x + 0.5, lastPoint.y + 0.5);
+                    }
+                    context.lineTo(point.x, point.y);
+                });
+                context.stroke();
+            }
         });
     });
     context.restore();
@@ -330,14 +401,14 @@ function drawPoint(path, point){
     context.restore();
 }
 
-function drawText(val, props, point){
+function drawText(props){
     //TODO: consolidate the context setup into a function of its own
     context.save();
     context.translate(-viewport.x, viewport.y);
     context.scale(viewport.scale, viewport.scale);
     context.font = props.size.toString() + 'px serif';
     context.fillStyle = props.color;
-    context.fillText(val, point.x, point.y);
+    context.fillText(props.val, props.point.x, props.point.y);
     context.stroke();
     context.restore();
 }
