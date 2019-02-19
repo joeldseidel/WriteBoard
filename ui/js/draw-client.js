@@ -189,7 +189,7 @@ function handleScale(e){
     var scaledCanvasPoint = convertWorldToCanvasSpace(worldPoint);
     var pointDelta = {
         x: canvasPoint.x - scaledCanvasPoint.x,
-        y: canvasPoint.y - scaledCanvasPoint
+        y: canvasPoint.y - scaledCanvasPoint.y
     };
     viewport.x -= pointDelta.x;
     viewport.y += pointDelta.y;
@@ -207,19 +207,19 @@ function redrawCanvas(){
             //Redraw every point in this path
             context.save();
             context.translate(-viewport.x, viewport.y);
-            //TODO: implement the canvas scale
+            context.scale(viewport.scale, viewport.scale);
             context.beginPath();
             context.strokeStyle = path.color;
             context.lineWidth = path.size;
             context.lineCap = 'round';
-            path.points.forEach(function(point, i){
-                point = convertLocalToCanvasSpace(point.x, point.y);
+            path.path.points.forEach(function(point, i){
+                point = convertCanvasToWorldSpace(convertLocalToCanvasSpace(point));
                 if(i === 0){
                     //This is the first point in this line
                     context.moveTo(point.x + 0.5, point.y + 0.5);
                 } else {
-                    var lastPoint = path.points[i - 1];
-                    lastPoint = convertLocalToCanvasSpace(lastPoint.x, lastPoint.y);
+                    var lastPoint = path.path.points[i - 1];
+                    lastPoint = convertCanvasToWorldSpace(convertLocalToCanvasSpace(lastPoint));
                     context.moveTo(lastPoint.x + 0.5, lastPoint.y + 0.5);
                 }
                 context.lineTo(point.x, point.y);
@@ -231,19 +231,18 @@ function redrawCanvas(){
 }
 
 function drawPoint(path, point){
-    point = convertWorldToLocalSpace(point);
+    point = convertCanvasToWorldSpace(convertLocalToCanvasSpace(point));
     //save the canvas context
     context.save();
     //Move the canvas origin according to user viewport
     context.translate(-viewport.x, viewport.y);
     //Change the canvas scale to reflect the user viewport zoom
-    context.scale(1, 1);
+    context.scale(viewport.scale, viewport.scale);
     context.beginPath();
     context.strokeStyle = path.color;
     context.lineWidth = path.size;
     context.lineCap = 'round';
     var points = path.points;
-    point = convertLocalToCanvasSpace(point.x, point.y);
     if(points.length === 0){
         //This is the first point so just move to its location
         context.moveTo(point.x + 0.5, point.y + 0.5);
@@ -251,7 +250,7 @@ function drawPoint(path, point){
     } else {
         //This is not the first point so move to the last drawn points location
         var lastPoint = path.points[path.points.length - 1];
-        lastPoint = convertLocalToCanvasSpace(lastPoint.x, lastPoint.y);
+        lastPoint = convertCanvasToWorldSpace(convertLocalToCanvasSpace(lastPoint));
         context.moveTo(lastPoint.x + 0.5, lastPoint.y + 0.5);
         console.log("drew a line from " + lastPoint.x + ", " + lastPoint.y + " to " + point.x + ", " + point.y);
     }
@@ -301,6 +300,17 @@ function convertWorldToCanvasSpace(worldLoc){
     point.x-=viewport.x;
     point.y+=viewport.y;
     return point;
+}
+
+function clone(obj){
+    var copy;
+    // Handle the 3 simple types, and null or undefined
+    if (null == obj || "object" != typeof obj) return obj;
+    copy = {};
+    for (var attr in obj) {
+        if (obj.hasOwnProperty(attr)) copy[attr] = clone(obj[attr]);
+    }
+    return copy;
 }
 
 window.onresize = function(){
