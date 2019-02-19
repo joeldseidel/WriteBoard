@@ -39,7 +39,14 @@
     </div>
 </div>
 <div id="text-tool">
-    <input class = "w-100" type="text" id="text-input">
+    <div class="row m-0 p-0">
+        <div class="col-8 m-0 p-0">
+            <input class = "w-100" type="text" id="text-input">
+        </div>
+        <div class="col-4 m-0 p-0">
+            <button type="button" class="w-100" id="enter-text-tool">Post</button>
+        </div>
+    </div>
 </div>
 <div id="toolbox">
     <div id="tool-select">

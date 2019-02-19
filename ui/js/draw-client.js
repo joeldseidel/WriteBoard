@@ -154,15 +154,18 @@ function toggleTextTool(point, isRedraw){
         textTool.css("display", "block");
         textEntry.css("display", "block");
         redrawTextTool(point);
+        textToolOpen = true;
     } else {
         //Text tool is open, determine what to do with it
         if(isRedraw){
             //User wants to move the text entry to a new place
             redrawTextTool(point);
+            textToolOpen = true;
         } else {
             //User wants the text entry box gone
             textTool.css("display", "none");
             textEntry.css("display", "none");
+            textToolOpen = false;
         }
     }
 }
@@ -170,8 +173,31 @@ function toggleTextTool(point, isRedraw){
 function redrawTextTool(point){
     var textTool = $('#text-tool');
     textTool.css("top", point.y);
-    textTool.css("right", point.x + 1);
+    textTool.css("left", point.x + 1);
 }
+
+$('#enter-text-tool').click(function(){
+    var textTool = $('#text-tool');
+    var textInput = $('#text-input').val();
+    if(textInput === ""){
+        //Nothing is in the text box, do nothing
+        return;
+    }
+    var relSize = tool.size / viewport.scale;
+    var props = {color : tool.color, size : relSize, type: 'text'};
+    var point = {
+        x : textTool.position().left,
+        y : textTool.position().top
+    };
+    var cmd = {
+        type : "new-text",
+        val : textInput,
+        props : props,
+        point : point
+    };
+    drawConn.send(JSON.stringify(cmd));
+    toggleTextTool({x:0,y:0}, false);
+});
 
 function handleCommand(e){
     var drawCmd = JSON.parse(JSON.parse(e));
@@ -208,6 +234,8 @@ function handleCommand(e){
         drawCmd.friendsHere.forEach(function(client){
             clients[client] = { id : client, paths : []};
         });
+    } else if(drawCmd.type === "new-text"){
+        drawText(drawCmd.val, drawCmd.props, drawCmd.point);
     }
 }
 
@@ -245,6 +273,7 @@ function handleScale(e){
 }
 
 function redrawCanvas(){
+    //FIXME: does not redraw text!
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
     context.save();
     context.translate(-viewport.x, viewport.y);
@@ -289,16 +318,26 @@ function drawPoint(path, point){
     if(points.length === 0){
         //This is the first point so just move to its location
         context.moveTo(point.x + 0.5, point.y + 0.5);
-        console.log("created a line at " + point.x + ", " + point.y);
     } else {
         //This is not the first point so move to the last drawn points location
         var lastPoint = path.points[path.points.length - 1];
         context.moveTo(lastPoint.x + 0.5, lastPoint.y + 0.5);
-        console.log("drew a line from " + lastPoint.x + ", " + lastPoint.y + " to " + point.x + ", " + point.y);
     }
     //Draw the line to the current point
     context.lineTo(point.x + 0.5, point.y + 0.5);
     //Update the canvas element
+    context.stroke();
+    context.restore();
+}
+
+function drawText(val, props, point){
+    //TODO: consolidate the context setup into a function of its own
+    context.save();
+    context.translate(-viewport.x, viewport.y);
+    context.scale(viewport.scale, viewport.scale);
+    context.font = props.size.toString() + 'px serif';
+    context.fillStyle = props.color;
+    context.fillText(val, point.x, point.y);
     context.stroke();
     context.restore();
 }
@@ -366,6 +405,8 @@ $('.tool-option').click(function(){
     tool.type = $(this).data("toolname");
     if(toolEditMenuOpen){
         toggleEditMenu({x:0, y:0});
+    } else if(textToolOpen){
+        toggleTextTool({x: 0, y:0});
     }
 });
 
