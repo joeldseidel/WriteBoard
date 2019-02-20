@@ -232,26 +232,27 @@ $('#upload-image-button').click(function(){
     var imageTool = $('#image-tool');
     var imageEntry = $('#image-input').prop("files")[0];
     var imageReader = new FileReader();
+    imageReader.addEventListener("load", function(){
+        var image = imageReader.result;
+        //TODO: size preview
+        var relSize = tool.size / viewport.scale;
+        var point = convertLocalToWorldSpace({
+            x: imageTool.position().left,
+            y: imageTool.position().top
+        });
+        var props = {color: tool.color, size: relSize, type: "image", point: point, data: image};
+        var cmd = {
+            type : "new-image",
+            props : props
+        };
+        drawConn.send(JSON.stringify(cmd));
+        toggleImageTool({x:0, y:0});
+    }, false);
     if(imageEntry){
         imageReader.readAsDataURL(imageEntry);
     } else {
         alert("Could not upload this image");
-        return;
     }
-    var image = imageReader.result;
-    //TODO: size preview
-    var relSize = tool.size / viewport.scale;
-    var point = convertLocalToWorldSpace({
-        x: imageTool.position().x,
-        y: imageTool.position().y
-    });
-    var props = {color: tool.color, size: relSize, type: "image", point: point, data: image};
-    var cmd = {
-        type : "new-image",
-        props : props
-    };
-    drawConn.send(JSON.stringify(cmd));
-    toggleImageTool({x:0, y:0});
 });
 
 function handleCommand(e){
@@ -297,6 +298,14 @@ function handleCommand(e){
             isDrawn: true
         };
         sendingClient.paths.push(textToolRecord);
+    } else if(drawCmd.type === "new-image"){
+        sendingClient = clients[drawCmd.id];
+        drawImage(drawCmd.props);
+        var imageToolRecord = {
+            path : drawCmd.props,
+            isDrawn : true
+        };
+        sendingClient.paths.push(imageToolRecord);
     }
 }
 
@@ -411,6 +420,18 @@ function drawText(props){
     context.fillText(props.val, props.point.x, props.point.y);
     context.stroke();
     context.restore();
+}
+
+function drawImage(props){
+    context.save();
+    context.translate(-viewport.x, viewport.y);
+    context.scale(viewport.scale, viewport.scale);
+    var thisImage = new Image();
+    thisImage.onload = function(){
+        context.drawImage(thisImage, props.point.x, props.point.y);
+        context.restore();
+    };
+    thisImage.src = props.data;
 }
 
 function convertLocalToWorldSpace(localLoc){
