@@ -28,8 +28,10 @@ $(document).ready(function(){
     });
     sendChatButton.click(function(){
         var msg = chatInput.val();
-        chatConn.send(msg);
-        chatInput.val('');
+        if(msg !== ''){
+            chatConn.send(msg);
+            chatInput.val('');
+        }
     });
     minChat.click(function(){
         var chat = $('#chat');

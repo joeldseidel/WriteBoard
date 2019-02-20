@@ -201,6 +201,7 @@ function toggleTextTool(point, isRedraw){
         textTool.css("display", "block");
         textEntry.css("display", "block");
         redrawTextTool(point);
+        textEntry.focus();
         textToolOpen = true;
     } else {
         //Text tool is open, determine what to do with it
@@ -232,6 +233,7 @@ function toggleImageTool(point){
         //Close the image tool
         imageTool.css("display", "none");
         imageEntry.css("display", "none");
+        imageEntry.val('');
         imageToolOpen = false;
     }
 }
@@ -405,7 +407,7 @@ function redrawCanvas(){
                 var thisImage = new Image();
                 thisImage.onload = function(){
                     var point = convertWorldToCanvasSpace(path.path.point);
-                    context.drawImage(thisImage, point.x, point.y , thisImage.width * viewport.scale, thisImage.height * viewport.scale);
+                    context.drawImage(thisImage, point.x, point.y, thisImage.width * viewport.scale, thisImage.height * viewport.scale);
                 };
                 thisImage.src = path.path.data;
             } else {
