@@ -127,6 +127,9 @@
             <div class="tool-edit-option" data-editattr="font">
                 <i class="material-icons">format_textdirection_l_to_r</i>
             </div>
+            <div class="tool-edit-option" data-editattr="close">
+                <i class="material-icons">close</i>
+            </div>
         </div>
     </div>
 </div>

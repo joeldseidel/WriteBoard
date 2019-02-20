@@ -643,7 +643,6 @@ function handleEditTool(attr){
         } else if(attr === "font"){
             $('#font-options').css("display", "block");
         }
-    } else if(tool.type === "image"){
     }
 }
 
