@@ -62,7 +62,7 @@
     <div id="tool-select">
         <ul class="toolbox-listing">
             <li>
-                <div class="tool-option" data-toolname="pen">
+                <div class="tool-option selected-tool" data-toolname="pen">
                     <i class="material-icons">border_color</i>
                     <p class="tool-name">Pen</p>
                 </div>

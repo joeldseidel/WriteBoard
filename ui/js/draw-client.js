@@ -8,7 +8,7 @@ var tool = {
     type : "pen",
     color : "#000",
     size : 8,
-    font : "serif"
+    font : "Roboto"
 };
 
 var clients = [];
