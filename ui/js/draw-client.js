@@ -44,7 +44,7 @@ canvas.onmousedown = function(e){
             toggleEditMenu(mouseLoc);
         } else {
             //The user is ready to start drawing, needs to send these points as world space
-            startLineDraw(convertLocalToWorldSpace(mouseLoc));
+            startLineDraw(mouseLoc);
         }
     } else if(e.which === 3){
         //Right click was clicked
@@ -92,20 +92,63 @@ canvas.addEventListener("wheel", function(e){
     //Enter the mess that is scaling
     handleScale(e);
 });
+window.onkeydown = function(e){
+    //Control all the key events
+    var key = e.which;
+    if(key >= 37 && key <= 40){
+        handleCanvasPan(key);
+    }
+};
+
+var panSensitivity = 10;
+
+//Pan the canvas around with the arrow keys
+function handleCanvasPan(key){
+    //directionVector: -1 if the direction should decrease, 1 if it should increase, 0 if it is unaffected
+    var directionVector;
+    switch(key){
+        case 37:
+            //Left arrow
+            directionVector = { x : -1, y : 0 };
+            break;
+        case 38:
+            //Up arrow
+            directionVector = { x : 0, y : 1 };
+            break;
+        case 39:
+            //Right arrow
+            directionVector = { x : 1, y : 0 };
+            break;
+        case 40:
+            //Down arrow
+            directionVector = { x : 0, y : -1 };
+            break;
+    }
+    //Implement the directional vector to the viewport
+    viewport.x += directionVector.x * panSensitivity;
+    viewport.y += directionVector.y * panSensitivity;
+    //Update the canvas to reflect the pan
+    context.save();
+    context.translate(-viewport.x, viewport.y);
+    context.restore();
+    redrawCanvas();
+}
+
 function startLineDraw(loc){
     //The path that needs to be started
     var thisLine;
     var relSize = tool.size / viewport.scale;
     if(tool.type === "pen"){
         //Start a new pen drawing path
+        loc = convertLocalToWorldSpace(loc);
         thisLine = { color : tool.color, size: relSize, points: [], type: 'pen'};
         emitNewLine(thisLine, loc);
     } else if(tool.type === "eraser") {
         //Start a new eraser drawing path
+        loc = convertLocalToWorldSpace(loc);
         thisLine = { color : '#ffffff', size: relSize, points: [], type: 'eraser'};
         emitNewLine(thisLine, loc);
     } else if(tool.type === "text"){
-        //FIXME: the text tool location is sometimes very wrong ~ this is because of acting on world space not local space
         toggleTextTool(loc);
     } else if(tool.type === "image"){
         toggleImageTool(loc);
