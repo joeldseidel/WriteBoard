@@ -7,7 +7,8 @@ var context = canvas.getContext("2d");
 var tool = {
     type : "pen",
     color : "#000",
-    size : 8
+    size : 8,
+    font : "serif"
 };
 
 var clients = [];
@@ -78,7 +79,6 @@ canvas.onmouseup = function(e){
     }
 };
 canvas.onmouseout = function(e){
-    //FIXME: this does not detect when the mouse leaves :(
     e.preventDefault();
     var mouseLoc = {x : e.pageX, y : e.pageY};
     if(mouseDown){
@@ -257,12 +257,12 @@ $('#enter-text-tool').click(function(){
         //Nothing is in the text box, do nothing
         return;
     }
-    var relSize = tool.size / viewport.scale;
+    var relSize = tool.size / viewport.scale * 5;
     var point = convertLocalToWorldSpace({
         x : textTool.position().left,
         y : textTool.position().top
     });
-    var props = {color : tool.color, size : relSize, type: 'text', point : point, val : textInput};
+    var props = {color : tool.color, size : relSize, font : tool.font, type: 'text', point : point, val : textInput};
     var cmd = {
         type : "new-text",
         props : props
@@ -396,7 +396,7 @@ function redrawCanvas(){
         client.paths.forEach(function(path){
             //FIXME: redraw sequencing?
             if (path.path.type === "text"){
-                context.font = path.path.size.toString() + 'px serif';
+                context.font = path.path.size.toString() + 'px ' + path.path.font.toString();
                 context.fillStyle = path.path.color;
                 var point = path.path.point;
                 context.fillText(path.path.val, point.x, point.y);
@@ -464,7 +464,7 @@ function drawText(props){
     context.save();
     context.translate(-viewport.x, viewport.y);
     context.scale(viewport.scale, viewport.scale);
-    context.font = props.size.toString() + 'px serif';
+    context.font = props.size.toString() + 'px ' + props.font.toString();
     context.fillStyle = props.color;
     context.fillText(props.val, props.point.x, props.point.y);
     context.stroke();
@@ -543,11 +543,17 @@ window.onload = function(){
 };
 
 $('.tool-option').click(function(){
+    $('.tool-option').each(function(){
+        $(this).removeClass("selected-tool");
+    });
     tool.type = $(this).data("toolname");
+    $(this).addClass("selected-tool");
     if(toolEditMenuOpen){
         toggleEditMenu({x:0, y:0});
     } else if(textToolOpen){
         toggleTextTool({x: 0, y:0});
+    } else if(imageToolOpen) {
+        toggleImageTool({x : 0, y : 0});
     }
 });
 
@@ -574,6 +580,11 @@ function toggleEditMenu(loc){
         case "eraser":
             contextMenu = $('#edit-eraser-tool');
             break;
+        case "text":
+            contextMenu = $('#edit-text-tool');
+            break;
+        case "image":
+            contextMenu = $('#edit-image-tool');
         default: return;
     }
     if(!toolEditMenuOpen){
@@ -629,6 +640,8 @@ function handleEditTool(attr){
             redrawEditTool();
         } else if(attr === "size"){
             $('#size-options').css("display", "block");
+        } else if(attr === "font"){
+            $('#font-options').css("display", "block");
         }
     } else if(tool.type === "image"){
     }
@@ -645,4 +658,9 @@ $(document).on('change', '#size-slider', function(){
     tool.size = $(this).val();
     $('#size-options').css("display", "none");
     toggleEditMenu({x: 0, y: 0});
+});
+$('.font-option').click(function(){
+    tool.font = $(this).data("font");
+    $('#font-options').css("display", "none");
+    toggleEditMenu({x:0,y:0});
 });

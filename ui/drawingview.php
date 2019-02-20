@@ -116,6 +116,19 @@
             </div>
         </div>
     </div>
+    <div class="tool-edit-listing" id="edit-text-tool">
+        <div class="m-0 p-0">
+            <div class="tool-edit-option" data-editattr="size">
+                <i class="material-icons">text_format</i>
+            </div>
+            <div class="tool-edit-option" data-editattr="color">
+                <i class="material-icons">format_color_fill</i>
+            </div>
+            <div class="tool-edit-option" data-editattr="font">
+                <i class="material-icons">format_textdirection_l_to_r</i>
+            </div>
+        </div>
+    </div>
 </div>
 <div id="color-options" class="edit-tool-submenu">
     <div class="color-option" data-color="#000000" style="background-color:rgba(0, 0, 0, 0.9)"></div>
@@ -129,6 +142,29 @@
 </div>
 <div id="size-options" class="edit-tool-submenu">
     <input type="range" min="2" max="32" value="8" step="2" id="size-slider" orient="vertical"/>
+</div>
+<div id="font-options" class="edit-tool-submenu">
+    <div class="font-option" data-font="Roboto" style="font-family:'Roboto', sans-serif">
+        <p>Roboto</p>
+    </div>
+    <div class="font-option" data-font="Lora" style="font-family:'Lora', serif">
+        <p>Lora</p>
+    </div>
+    <div class="font-option" data-font="Playfair Display" style="font-family='Playfair Display', serif">
+        <p>Playfair Display</p>
+    </div>
+    <div class="font-option" data-font="Passion One" style="font-family:'Passion One', cursive">
+        <p>Passion One</p>
+    </div>
+    <div class="font-option" data-font="Amatic SC" style="font-family:'Amatic SC', cursive">
+        <p>Amatic SC</p>
+    </div>
+    <div class="font-option" data-font="Roboto Mono" style="font-family:'Roboto Mono', monospace">
+        <p>Roboto Mono</p>
+    </div>
+    <div class="font-option" data-font="VT323" style="font-family:'VT323', monospace">
+        <p>VT323</p>
+    </div>
 </div>
 <!-- the drawing area and magical land: the canvas -->
 <canvas id="canvas" oncontextmenu="return false"></canvas>

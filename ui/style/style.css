@@ -1,3 +1,10 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+@import url('https://fonts.googleapis.com/css?family=Lora');
+@import url('https://fonts.googleapis.com/css?family=Passion+One');
+@import url('https://fonts.googleapis.com/css?family=Amatic+SC');
+@import url('https://fonts.googleapis.com/css?family=Roboto+Mono');
+@import url('https://fonts.googleapis.com/css?family=VT323');
+@import url('https://fonts.googleapis.com/css?family=Playfair+Display');
 body{
     margin: 0;
     overflow-y: hidden;
@@ -101,6 +108,7 @@ body{
 
 .tool-option{
     cursor: pointer;
+    color: #888888;
 }
 
 .tool-option:hover{
@@ -200,5 +208,20 @@ body{
 }
 
 #image-input{
+    color: white;
+}
+
+.selected-tool{
+    color : white;
+}
+
+#font-options{
+    background-color: rgba(0,0,0,0.75);
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.font-option{
+    cursor:pointer;
     color: white;
 }
