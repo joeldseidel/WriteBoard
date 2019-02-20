@@ -355,10 +355,16 @@ function redrawCanvas(){
             if (path.path.type === "text"){
                 context.font = path.path.size.toString() + 'px serif';
                 context.fillStyle = path.path.color;
-                context.fillText(path.path.val, path.path.point.x, path.path.point.y);
+                var point = path.path.point;
+                context.fillText(path.path.val, point.x, point.y);
                 context.stroke();
             } else if (path.path.type === "image"){
-                //TODO: implement the image tool
+                var thisImage = new Image();
+                thisImage.onload = function(){
+                    var point = convertWorldToCanvasSpace(path.path.point);
+                    context.drawImage(thisImage, point.x, point.y , thisImage.width * viewport.scale, thisImage.height * viewport.scale);
+                };
+                thisImage.src = path.path.data;
             } else {
                 //This is a pen or eraser, draw it like a line, nothing special
                 //Redraw every point in this path
@@ -428,7 +434,7 @@ function drawImage(props){
     context.scale(viewport.scale, viewport.scale);
     var thisImage = new Image();
     thisImage.onload = function(){
-        context.drawImage(thisImage, props.point.x, props.point.y);
+        context.drawImage(thisImage, props.point.x, props.point.y, thisImage.width * viewport.scale, thisImage.height * viewport.scale);
         context.restore();
     };
     thisImage.src = props.data;
