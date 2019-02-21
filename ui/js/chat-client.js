@@ -3,7 +3,7 @@ if(!"WebSocket" in window){
 }
 var username = getUsernameArg();
 var chatElement = $('#chat-view');
-var chatConn = new WebSocket("ws://localhost:8080/chat");
+var chatConn = new WebSocket("ws://18.191.68.244:8282/chat");
 var chatShown = true;
 
 chatConn.onopen = function(){
@@ -93,7 +93,7 @@ function formatChatMessage(e){
         updateUnread();
     }
     messageCount++;
-    messageElement.appendTo(chatElement);
+    messageElement.prependTo(chatElement);
 }
 
 function updateUnread(){
