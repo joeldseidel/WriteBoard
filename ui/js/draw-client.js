@@ -99,7 +99,7 @@ canvas.addEventListener("wheel", function(e){
 });
 var touchPoints = 0;
 var gesturing = false;
-canvas.addEventListener("touchstart", function(e){
+canvas.addEventListener('touchstart', function(e){
     e.preventDefault();
     if(e.touches.length === 1){
         //One finger is currently on the screen
@@ -139,26 +139,26 @@ var touchPosition = {
     x : 0,
     y : 0
 };
-canvas.addEventListener("touchmove", function(e){
+canvas.addEventListener('touchmove', function(e){
     e.preventDefault();
-    if(e.touches.length === 1){
-        var touchLoc = {x : e.touches[0].pageX, y : e.touches[0].pageY};
+    if(e.touches.length === 1) {
+        var touchLoc = {x: e.touches[0].pageX, y: e.touches[0].pageY};
         touchPosition = touchLoc;
-        if(!gesturing){
+        if (!gesturing) {
             //Only one finger on the screen, do the thing
             lineDraw(convertLocalToWorldSpace(touchLoc));
-        } else {
-            //More than one finger on the screen
-            var gesturePoint1 = convertLocalToCanvasSpace({
-                x : e.touches[0].pageX,
-                y : e.touches[0].pageY
-            });
-            var gesturePoint2 = convertLocalToCanvasSpace({
-                x : e.touches[1].pageX,
-                y : e.touches[1].pageY
-            });
-            gestureDrag(gesturePoint1, gesturePoint2);
         }
+    } else {
+        //More than one finger on the screen
+        var gesturePoint1 = convertLocalToCanvasSpace({
+            x : e.touches[0].pageX,
+            y : e.touches[0].pageY
+        });
+        var gesturePoint2 = convertLocalToCanvasSpace({
+            x : e.touches[1].pageX,
+            y : e.touches[1].pageY
+        });
+        gestureDrag(gesturePoint1, gesturePoint2);
     }
 });
 canvas.addEventListener("touchend", function(e){
@@ -174,14 +174,14 @@ function gestureStart(point1, point2, first){
         cancelDraw();
     }
     gesture.viewport = clone(viewport);
-    gesture.start = point1;
-    gesture.end = point2;
+    gesture.point1 = point1;
+    gesture.point2 = point2;
     gesture.average = {
-        x : (point1.x+point2.x) / 2,
-        y : (point1.y+point2.y) / 2
+        x : (point1.x + point2.x) / 2,
+        y : (point1.y + point2.y) / 2
     };
     gesture.averageWorld = convertCanvasToWorldSpace(gesture.average);
-    gesture.distance = Math.sqrt((point2.x - point1.x) * (point2.x - point1.x)+(point2.y - point1.y) * (point2.y - point1.y));
+    gesture.distance = Math.sqrt((point2.x - point1.x) * (point2.x - point1.x) + (point2.y - point1.y) * (point2.y - point1.y));
 }
 function gestureDrag(point1, point2){
     //Get the average position of the drag
@@ -196,8 +196,8 @@ function gestureDrag(point1, point2){
     var currentPos = convertWorldToCanvasSpace(gesture.averageWorld);
     var newPos = {x : avgX, y : avgY};
     //Convert the gesture delta to the viewport
-    viewport.x = newPos.x - currentPos.x;
-    viewport.y = newPos.y - currentPos.y;
+    viewport.x -= newPos.x - currentPos.x;
+    viewport.y += newPos.y - currentPos.y;
     redrawCanvas();
 }
 window.onkeydown = function(e){
