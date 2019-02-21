@@ -224,7 +224,7 @@ window.onkeydown = function(e){
         handleRecenter();
     }
     //If user is pressing the e key and they aren't drawing
-    if(key === 69 && !mouseDown){
+    if(key === 69 && !mouseDown && !textToolOpen){
         //Macs are stupid and cant use the right click so here is a keyboard shortcut
         if(toolEditMenuOpen){
             //User is right clicking again, must want to move the position of the edit tool menu

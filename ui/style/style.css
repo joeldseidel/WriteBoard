@@ -260,9 +260,11 @@ body{
 @media only screen and (max-width: 768px){
     #mini-chat{
         width: 100%;
+        display: block;
     }
     #chat{
         width: 100%;
+        display: none;
     }
     #toolbox{
         display: none;

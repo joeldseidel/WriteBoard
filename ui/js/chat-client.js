@@ -19,6 +19,13 @@ $(document).ready(function(){
     var chatInput = $('#chat-input');
     var minChat = $('#close-chat-button');
     var openChat = $('#open-chat');
+    if(screen.width <= 768){
+        //Start with mini chat open and big chat closed
+        //Show the mobile drawing menus
+        $('#mobile-tool-box').css("display", "block");
+        $('#mobile-context').css("display", "block");
+        chatShown = false;
+    }
     chatInput.keypress(function (e) {
         var key = e.which;
         if(key === 13){
@@ -65,7 +72,7 @@ function getUsernameArg(){
     return usernameParam;
 }
 
-//Initially -1 because the first "message" from the server is the chat log
+//Initially -1 because the first "message" from the server is the chat log and the second is the I joined the chat
 //Therefore after receiving the logs, there will be 0 messages in the chat
 var messageCount = -1;
 var unreadMessageCount = 0;
@@ -95,7 +102,7 @@ function formatChatMessage(e){
         textElement.text(message.msg);
         textElement.appendTo(messageElement);
     }
-    if(!chatShown){
+    if(!chatShown && messageCount > 0){
         unreadMessageCount++;
         updateUnread();
     }
