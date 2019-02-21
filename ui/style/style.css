@@ -225,3 +225,7 @@ body{
     cursor:pointer;
     color: white;
 }
+
+#main-title{
+    text-align: center;
+}
