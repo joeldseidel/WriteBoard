@@ -63,19 +63,19 @@
         <ul class="toolbox-listing">
             <li>
                 <div class="tool-option selected-tool" data-toolname="pen">
-                    <i class="material-icons">border_color</i>
+                    <i class="material-icons w-100">border_color</i>
                     <p class="tool-name">Pen</p>
                 </div>
             </li>
             <li>
                 <div class="tool-option" data-toolname="eraser">
-                    <i class="material-icons">border_clear</i>
+                    <i class="material-icons w-100">border_clear</i>
                     <p class="tool-name">Eraser</p>
                 </div>
             </li>
             <li>
                 <div class="tool-option" data-toolname="text">
-                    <i class="material-icons">text_fields</i>
+                    <i class="material-icons w-100">text_fields</i>
                     <p class="tool-name">Text</p>
                 </div>
             </li>
@@ -87,6 +87,12 @@
             </li>
         </ul>
     </div>
+</div>
+<div id="mobile-tool-box">
+    <i class="material-icons">widgets</i>
+</div>
+<div id="mobile-context">
+    <i class="material-icons">settings</i>
 </div>
 <div id="tool-edit-menu" oncontextmenu="return false">
     <div class="tool-edit-listing" id="edit-pen-tool">

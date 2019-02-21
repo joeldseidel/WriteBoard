@@ -38,12 +38,19 @@ $(document).ready(function(){
         var minichat = $('#mini-chat');
         chat.slideToggle();
         minichat.css("display", "block");
+        if(screen.width <= 768){
+            //Show the mobile drawing menus
+            $('#mobile-tool-box').css("display", "block");
+            $('#mobile-context').css("display", "block");
+        }
         chatShown = false;
     });
     openChat.click(function(){
         var chat = $('#chat');
         var minichat = $('#mini-chat');
         minichat.css("display", "none");
+        $('#mobile-tool-box').css("display", "none");
+        $('#mobile-context').css("display", "none");
         chat.slideToggle();
         unreadMessageCount = 0;
         updateUnread();

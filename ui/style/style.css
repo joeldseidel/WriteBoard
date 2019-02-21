@@ -35,6 +35,7 @@ body{
     border-left: 2px solid #1f3d7a;
     box-shadow: -2px 0 10px #888888;
     background-color: rgba(0,0,0,0.75);
+    padding-bottom: 1px;
 }
 
 #chat-view{
@@ -106,6 +107,17 @@ body{
     box-shadow: 0 0 10px #888888;
 }
 
+#mobile-tool-box{
+    display : none;
+    position : absolute;
+    padding: 10px;
+    color: white;
+    top : 0;
+    left : 0;
+    background-color:  rgba(0,0,0,0.75);
+    border-bottom-right-radius: 10px;
+}
+
 .tool-option{
     cursor: pointer;
     color: #888888;
@@ -124,8 +136,12 @@ body{
     list-style-type: none;
 }
 
+#toolbox i {
+    text-align: center;
+}
+
 .tool-name{
-    text-align: left;
+    text-align: center;
 }
 
 #tool-edit-menu{
@@ -136,6 +152,17 @@ body{
     border-radius: 5px;
     background-color: rgba(0,0,0,0.75);
     box-shadow: 0 0 10px #888888;
+}
+
+#mobile-context{
+    display: none;
+    position: absolute;
+    top : 0;
+    right: 0;
+    background-color: rgba(0,0,0,0.75);
+    color: white;
+    padding: 10px;
+    border-bottom-left-radius: 10px;
 }
 
 .tool-edit-option{
@@ -228,4 +255,22 @@ body{
 
 #main-title{
     text-align: center;
+}
+
+@media only screen and (max-width: 768px){
+    #mini-chat{
+        width: 100%;
+    }
+    #chat{
+        width: 100%;
+    }
+    #toolbox{
+        display: none;
+        width: 100%;
+        border-radius: 0;
+    }
+    #tool-edit-menu{
+        width: 100%;
+        border-radius: 0;
+    }
 }

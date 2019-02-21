@@ -79,7 +79,7 @@ canvas.onmouseup = function(e){
     var mouseLoc = {x : e.pageX, y : e.pageY};
     if(mouseDown){
         //Stop drawing the current line if the mouse was down
-        stopLineDraw(convertLocalToWorldSpace(mouseLoc));
+        stopLineDraw(convertLocalToWorldSpace(mouseLoc), true);
         mouseDown = false;
     }
 };
@@ -88,7 +88,7 @@ canvas.onmouseout = function(e){
     var mouseLoc = {x : e.pageX, y : e.pageY};
     if(mouseDown){
         //Stop drawing the current line if the mouse was down
-        stopLineDraw(convertLocalToWorldSpace(mouseLoc));
+        stopLineDraw(convertLocalToWorldSpace(mouseLoc), true);
         mouseDown = false;
     }
 };
@@ -99,8 +99,13 @@ canvas.addEventListener("wheel", function(e){
 });
 var touchPoints = 0;
 var gesturing = false;
+var touchLineOpen = false;
 canvas.addEventListener('touchstart', function(e){
     e.preventDefault();
+    if(toolBoxOpen){
+        toggleToolBoxOpen();
+        return;
+    }
     if(e.touches.length === 1){
         //One finger is currently on the screen
         touchPoints = 1;
@@ -115,6 +120,12 @@ canvas.addEventListener('touchstart', function(e){
                 toggleEditMenu(touchLoc);
             } else {
                 //The user is ready to start drawing, needs to send these points as world space
+                if(touchLineOpen){
+                    //The user tapped too quickly
+                    //Just stop the current line at whatever position it was last at
+                    stopLineDraw(touchLoc, false);
+                }
+                touchLineOpen = true;
                 startLineDraw(touchLoc);
             }
         }
@@ -136,8 +147,8 @@ canvas.addEventListener('touchstart', function(e){
     }
 });
 var touchPosition = {
-    x : 0,
-    y : 0
+    x : -1,
+    y : -1
 };
 canvas.addEventListener('touchmove', function(e){
     e.preventDefault();
@@ -165,7 +176,8 @@ canvas.addEventListener("touchend", function(e){
     touchPoints = e.touches.length;
     if(touchPoints === 0){
         gesturing = false;
-        stopLineDraw(convertLocalToWorldSpace(touchPosition));
+        touchLineOpen = false;
+        stopLineDraw(convertLocalToWorldSpace(touchPosition), true);
     }
 });
 var gesture = {};
@@ -312,13 +324,15 @@ function lineDraw(loc){
     drawConn.send(JSON.stringify(cmd));
 }
 
-function stopLineDraw(loc){
-    var cmd = {
-        type : "update-draw",
-        point : loc
-    };
-    //Send the final point to the server to be drawn
-    drawConn.send(JSON.stringify(cmd));
+function stopLineDraw(loc, drawFinal){
+    if(drawFinal){
+        var cmd = {
+            type : "update-draw",
+            point : loc
+        };
+        //Send the final point to the server to be drawn
+        drawConn.send(JSON.stringify(cmd));
+    }
     cmd = {
         type : "close-path"
     };
@@ -731,6 +745,31 @@ window.onload = function(){
     redrawCanvas();
 };
 
+var toolBoxOpen = false;
+
+//Enable the toolbox from the mobile one
+$('#mobile-tool-box').click(function(){
+    toggleToolBoxOpen();
+});
+
+function toggleToolBoxOpen(){
+    var toolbox = $('#toolbox');
+    var miniToolBox = $('#mobile-tool-box');
+    var miniContext = $('#mobile-context');
+    if(toolBoxOpen){
+        //Tool box should be closed
+        miniToolBox.css("display", "block");
+        miniContext.css("display", "block");
+        toolbox.css("display", "none");
+        toolBoxOpen = false;
+    } else {
+        miniToolBox.css("display", "none");
+        miniContext.css("disaply", "none");
+        toolbox.css("display", "block");
+        toolBoxOpen = true;
+    }
+}
+
 $('.tool-option').click(function(){
     $('.tool-option').each(function(){
         $(this).removeClass("selected-tool");
@@ -743,6 +782,10 @@ $('.tool-option').click(function(){
         toggleTextTool({x: 0, y:0});
     } else if(imageToolOpen) {
         toggleImageTool({x : 0, y : 0});
+    }
+    //Close the entire toolbox
+    if(screen.width <= 768){
+        toggleToolBoxOpen();
     }
 });
 
@@ -781,7 +824,9 @@ function toggleEditMenu(loc){
         toolEditMenu.css("display", "block");
         contextMenu.css("display", "block");
         contextMenu.find(".tool-edit-option").css("display", "block");
-        redrawEditMenu(loc);
+        if(screen.width >= 768){
+            redrawEditMenu(loc);
+        }
         toolEditMenuOpen = true;
     } else {
         //Tool edit menu is open, but it needs to not be
