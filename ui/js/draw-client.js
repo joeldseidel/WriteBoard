@@ -397,23 +397,25 @@ function redrawCanvas(){
     context.save();
     context.translate(-viewport.x, viewport.y);
     context.scale(viewport.scale, viewport.scale);
-    //Redraw the paths of every client
-    clients.forEach(function(client){
-        //Redraw every one of this client's paths
-        var pathsRemaining = client.paths.length;
-        client.paths.forEach(function(path){
-            entities.push(path);
-            pathsRemaining --;
-            if(pathsRemaining === 0){
-                calcRedrawOrder();
+    for(var i = 0; i < clients.length; i++){
+        //Clients loop
+        var client = clients[i];
+        if(!client){
+            continue;
+        }
+        if(client.paths.length !== 0){
+            //Client does not have any paths
+            for(var j = 0; j < client.paths.length; j++){
+                //Paths loop
+                entities.push(client.paths[j]);
             }
-        });
-    });
-}
-
-function calcRedrawOrder(){
+        }
+    }
     entities.sort(function(a,b){return a.timestamp - b.timestamp});
-    doRedraw(entities[currentEntityCounter]);
+    if(entities.length > 0){
+        //Start the recursive redraw
+        doRedraw(entities[currentEntityCounter]);
+    }
 }
 
 var currentEntityCounter = 0;
