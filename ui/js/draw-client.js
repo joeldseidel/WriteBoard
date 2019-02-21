@@ -10,6 +10,11 @@ var tool = {
     size : 8,
     font : "Roboto"
 };
+//Current mouse position for the keyboard shortcuts
+var mousePoint = {
+    x : 0,
+    y :0
+};
 
 //Used for drawing
 var clients = [];
@@ -61,12 +66,11 @@ canvas.onmousedown = function(e){
 };
 canvas.onmousemove = function(e) {
     e.preventDefault();
+    mousePoint = {x : e.pageX, y : e.pageY};
     if (mouseDown) {
         //The mouse was already down, meaning the user is mid-line
-        //Get the local mouse position
-        var mouseLoc = {x: e.pageX, y : e.pageY};
         //Create a new point on the current line
-        lineDraw(convertLocalToWorldSpace(mouseLoc));
+        lineDraw(convertLocalToWorldSpace(mousePoint));
     }
 };
 canvas.onmouseup = function(e){
@@ -97,11 +101,27 @@ window.onkeydown = function(e){
     //Control all the key events
     var key = e.which;
     if(key >= 37 && key <= 40){
+        //One of the arrow keys down
         handleCanvasPan(key);
+    }
+    if(key === 67){
+        //C key down
+        handleRecenter();
+    }
+    //If user is pressing the e key and they aren't drawing
+    if(key === 69 && !mouseDown){
+        //Macs are stupid and cant use the right click so here is a keyboard shortcut
+        if(toolEditMenuOpen){
+            //User is right clicking again, must want to move the position of the edit tool menu
+            redrawEditMenu(mousePoint);
+        } else {
+            //User is right clicking without the menu open, must want to open it
+            toggleEditMenu(mousePoint);
+        }
     }
 };
 
-var panSensitivity = 10;
+var panSensitivity = 15;
 
 //Pan the canvas around with the arrow keys
 function handleCanvasPan(key){
@@ -131,6 +151,20 @@ function handleCanvasPan(key){
     //Update the canvas to reflect the pan
     context.save();
     context.translate(-viewport.x, viewport.y);
+    context.restore();
+    redrawCanvas();
+}
+
+//Recenter the viewport to the starting position
+function handleRecenter(){
+    //Update the user viewport
+    viewport.x = 0;
+    viewport.y = 0;
+    viewport.scale = 1;
+    //Update the canvas to reflect the movement
+    context.save();
+    context.translate(viewport.x, viewport.y);
+    context.scale(viewport.scale, viewport.scale);
     context.restore();
     redrawCanvas();
 }
@@ -355,7 +389,7 @@ function handleCommand(e){
     }
 }
 
-var zoomSensitivity = 0.01;
+var zoomSensitivity = 0.025;
 
 function handleScale(e){
     var normalized;
