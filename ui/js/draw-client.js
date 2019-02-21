@@ -11,8 +11,9 @@ var tool = {
     font : "Roboto"
 };
 
+//Used for drawing
 var clients = [];
-var drawConn = new WebSocket("ws://localhost:8080/draw");
+var drawConn = new WebSocket("ws://18.191.68.244:8282/draw");
 
 var toolEditMenuOpen = false;
 
@@ -157,7 +158,7 @@ function startLineDraw(loc){
 
 function emitNewLine(thisLine, loc){
     //Add the current point to the path array
-    var cmd = {type : "new-path", path : thisLine};
+    var cmd = {type : "new-path", timestamp : new Date().getTime(), path : thisLine};
     //Announce that there is a new path
     drawConn.send(JSON.stringify(cmd));
     cmd = {type: "update-draw", point: loc};
@@ -192,7 +193,6 @@ var textToolOpen = false;
 
 //Toggle the text tool
 //isRedraw - does the user want it closed or just to move it?
-//FIXME: get rid of isredraw, i don't remember what it was supposed to mean
 function toggleTextTool(point, isRedraw){
     var textTool = $('#text-tool');
     var textEntry = $('#text-input');
@@ -267,6 +267,7 @@ $('#enter-text-tool').click(function(){
     var props = {color : tool.color, size : relSize, font : tool.font, type: 'text', point : point, val : textInput};
     var cmd = {
         type : "new-text",
+        timestamp : new Date().getTime(),
         props : props
     };
     drawConn.send(JSON.stringify(cmd));
@@ -279,7 +280,6 @@ $('#upload-image-button').click(function(){
     var imageReader = new FileReader();
     imageReader.addEventListener("load", function(){
         var image = imageReader.result;
-        //TODO: size preview
         var relSize = tool.size / viewport.scale;
         var point = convertLocalToWorldSpace({
             x: imageTool.position().left,
@@ -288,6 +288,7 @@ $('#upload-image-button').click(function(){
         var props = {color: tool.color, size: relSize, type: "image", point: point, data: image};
         var cmd = {
             type : "new-image",
+            timestamp : new Date().getTime(),
             props : props
         };
         drawConn.send(JSON.stringify(cmd));
@@ -387,51 +388,84 @@ function handleScale(e){
     redrawCanvas();
 }
 
+var entities = [];
+
 function redrawCanvas(){
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+    entities = [];
+    currentEntityCounter = 0;
     context.save();
     context.translate(-viewport.x, viewport.y);
     context.scale(viewport.scale, viewport.scale);
     //Redraw the paths of every client
     clients.forEach(function(client){
         //Redraw every one of this client's paths
+        var pathsRemaining = client.paths.length;
         client.paths.forEach(function(path){
-            //FIXME: redraw sequencing?
-            if (path.path.type === "text"){
-                context.font = path.path.size.toString() + 'px ' + path.path.font.toString();
-                context.fillStyle = path.path.color;
-                var point = path.path.point;
-                context.fillText(path.path.val, point.x, point.y);
-                context.stroke();
-            } else if (path.path.type === "image"){
-                var thisImage = new Image();
-                thisImage.onload = function(){
-                    var point = convertWorldToCanvasSpace(path.path.point);
-                    context.drawImage(thisImage, point.x, point.y, thisImage.width * viewport.scale, thisImage.height * viewport.scale);
-                };
-                thisImage.src = path.path.data;
-            } else {
-                //This is a pen or eraser, draw it like a line, nothing special
-                //Redraw every point in this path
-                context.beginPath();
-                context.strokeStyle = path.path.color;
-                context.lineWidth = path.path.size;
-                context.lineCap = 'round';
-                path.path.points.forEach(function(point, i){
-                    if(i === 0){
-                        //This is the first point in this line
-                        context.moveTo(point.x + 0.5, point.y + 0.5);
-                    } else {
-                        var lastPoint = path.path.points[i - 1];
-                        context.moveTo(lastPoint.x + 0.5, lastPoint.y + 0.5);
-                    }
-                    context.lineTo(point.x, point.y);
-                });
-                context.stroke();
+            entities.push(path);
+            pathsRemaining --;
+            if(pathsRemaining === 0){
+                calcRedrawOrder();
             }
         });
     });
     context.restore();
+}
+
+function calcRedrawOrder(){
+    entities.sort(function(a,b){return a.timestamp - b.timestamp});
+    doRedraw(entities[currentEntityCounter]);
+}
+
+var currentEntityCounter = 0;
+
+function doRedraw(path){
+    if (path.path.type === "text"){
+        context.font = path.path.size.toString() + 'px ' + path.path.font.toString();
+        context.fillStyle = path.path.color;
+        var point = convertWorldToCanvasSpace(path.path.point);
+        context.fillText(path.path.val, point.x, point.y);
+        context.stroke();
+        currentEntityCounter++;
+        if(entities[currentEntityCounter]){
+            doRedraw(entities[currentEntityCounter]);
+        }
+    } else if (path.path.type === "image"){
+        var thisImage = new Image();
+        thisImage.onload = function(){
+            var point = convertWorldToCanvasSpace(path.path.point);
+            context.drawImage(thisImage, point.x, point.y, thisImage.width * viewport.scale, thisImage.height * viewport.scale);
+            currentEntityCounter++;
+            if(entities[currentEntityCounter]){
+                doRedraw(entities[currentEntityCounter]);
+            }
+        };
+        thisImage.src = path.path.data;
+    } else {
+        //This is a pen or eraser, draw it like a line, nothing special
+        //Redraw every point in this path
+        context.beginPath();
+        context.strokeStyle = path.path.color;
+        context.lineWidth = path.path.size;
+        context.lineCap = 'round';
+        path.path.points.forEach(function(point, i){
+            point = convertWorldToCanvasSpace(point);
+            if(i === 0){
+                //This is the first point in this line
+                context.moveTo(point.x + 0.5, point.y + 0.5);
+            } else {
+                var lastPoint = path.path.points[i - 1];
+                lastPoint = convertWorldToCanvasSpace(lastPoint);
+                context.moveTo(lastPoint.x + 0.5, lastPoint.y + 0.5);
+            }
+            context.lineTo(point.x, point.y);
+        });
+        context.stroke();
+        currentEntityCounter++;
+        if(entities[currentEntityCounter]){
+            doRedraw(entities[currentEntityCounter]);
+        }
+    }
 }
 
 function drawPoint(path, point){
