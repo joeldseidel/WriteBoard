@@ -6,6 +6,7 @@ use Ratchet\ConnectionInterface;
 class Draw implements MessageComponentInterface{
     protected $clients;
     private $connectedUsers;
+    private $api_url = "18.191.68.244:6869";
     public function __construct(){
         $this->clients = new \SplObjectStorage;
         $this->connectedUsers = [];
@@ -22,16 +23,17 @@ class Draw implements MessageComponentInterface{
         $welcomeMsg = new \stdClass();
         $welcomeMsg->type = "welcome";
         $welcomeMsg->friendsHere = $connectedIds;
+        $welcomeMsg->me = $conn->resourceId;
         $this->sendMessage(json_encode($welcomeMsg));
     }
     public function onMessage(ConnectionInterface $from, $msg){
         //Open the command
         $msg = json_decode($msg);
-        if($msg->type == "end-path"){
-            handleLineCommit($msg->lineData);
-        }
         //add the sender id
         $msg->id = $from->resourceId;
+        if($msg->type == "close-path"){
+            $this->handleLineCommit($msg->lineData, $msg->id);
+        }
         //Close the command
         $msg = json_encode($msg);
         //Send the command to connected clients
@@ -48,5 +50,9 @@ class Draw implements MessageComponentInterface{
     }
     public function onError(ConnectionInterface $conn, \Exception $e){
         echo "Error occurred :[   ERROR MESSAGE: {$e->getMessage()}\n";
+    }
+    public function handleLineCommit($lineData, $id){
+        //TODO make the http request
+        echo "line commit from " . $id;
     }
 }

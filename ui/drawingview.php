@@ -96,20 +96,14 @@
 </div>
 <div id="tool-edit-menu" oncontextmenu="return false">
     <div class="tool-edit-listing" id="edit-pen-tool">
-        <div class="m-0 p-0">
-            <div class="tool-edit-option w-100" data-editattr="color">
-                <i class="material-icons">format_color_fill</i>
-            </div>
+        <div class="tool-edit-option w-100" data-editattr="color">
+            <i class="material-icons">format_color_fill</i>
         </div>
-        <div>
-            <div class="tool-edit-option" data-editattr="size">
-                <i class="material-icons">bubble_chart</i>
-            </div>
+        <div class="tool-edit-option w-100" data-editattr="size">
+            <i class="material-icons">bubble_chart</i>
         </div>
-        <div>
-            <div class="tool-edit-option" data-editattr="close">
-                <i class="material-icons">close</i>
-            </div>
+        <div class="tool-edit-option w-100" data-editattr="close">
+            <i class="material-icons">close</i>
         </div>
     </div>
     <div class="tool-edit-listing" id="edit-eraser-tool">

@@ -18,6 +18,8 @@ var mousePoint = {
 
 //Used for drawing
 var clients = [];
+//My client id
+var me = -1;
 var drawConn = new WebSocket("ws://18.191.68.244:8282/draw");
 
 var toolEditMenuOpen = false;
@@ -333,11 +335,21 @@ function stopLineDraw(loc, drawFinal){
         //Send the final point to the server to be drawn
         drawConn.send(JSON.stringify(cmd));
     }
-    cmd = {
-        type : "close-path"
-    };
-    //Tell everyone that the line is done
-    drawConn.send(JSON.stringify(cmd));
+    var myPaths = clients[me].paths;
+    var lineData;
+    for(var i = 0; i < myPaths.length; i++){
+        if(!myPaths[i].isDrawn){
+            lineData = myPaths[i];
+            //Can't have it reload as open
+            lineData.isDrawn = true;
+            cmd = {
+                type : "close-path",
+                lineData : lineData
+            };
+            //Tell everyone that the line is done
+            drawConn.send(JSON.stringify(cmd));
+        }
+    }
 }
 
 function cancelDraw(){
@@ -494,6 +506,7 @@ function handleCommand(e){
         drawCmd.friendsHere.forEach(function(client){
             clients[client] = { id : client, paths : []};
         });
+        me = drawCmd.me;
     } else if(drawCmd.type === "new-text"){
         sendingClient = clients[drawCmd.id];
         drawText(drawCmd.props);
