@@ -456,10 +456,10 @@ function doRedraw(path){
         path.path.points.forEach(function(point, i){
             if(i === 0){
                 //This is the first point in this line
-                context.moveTo(point.x + 0.5, point.y + 0.5);
+                context.moveTo(point.x, point.y);
             } else {
                 var lastPoint = path.path.points[i - 1];
-                context.moveTo(lastPoint.x + 0.5, lastPoint.y + 0.5);
+                context.moveTo(lastPoint.x, lastPoint.y);
             }
             context.lineTo(point.x, point.y);
         });
@@ -487,14 +487,14 @@ function drawPoint(path, point){
     var points = path.points;
     if(points.length === 0){
         //This is the first point so just move to its location
-        context.moveTo(point.x + 0.5, point.y + 0.5);
+        context.moveTo(point.x, point.y);
     } else {
         //This is not the first point so move to the last drawn points location
         var lastPoint = path.points[path.points.length - 1];
-        context.moveTo(lastPoint.x + 0.5, lastPoint.y + 0.5);
+        context.moveTo(lastPoint.x, lastPoint.y);
     }
     //Draw the line to the current point
-    context.lineTo(point.x + 0.5, point.y + 0.5);
+    context.lineTo(point.x, point.y);
     //Update the canvas element
     context.stroke();
     context.restore();
