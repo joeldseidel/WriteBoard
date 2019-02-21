@@ -97,6 +97,109 @@ canvas.addEventListener("wheel", function(e){
     //Enter the mess that is scaling
     handleScale(e);
 });
+var touchPoints = 0;
+var gesturing = false;
+canvas.addEventListener("touchstart", function(e){
+    e.preventDefault();
+    if(e.touches.length === 1){
+        //One finger is currently on the screen
+        touchPoints = 1;
+        if(!gesturing){
+            //Not currently gesturing so perform the action
+            var touchLoc = {
+                x : e.touches[0].pageX,
+                y : e.touches[0].pageY
+            };
+            if(toolEditMenuOpen) {
+                //User wants the edit tool menu to go away, not start drawing
+                toggleEditMenu(touchLoc);
+            } else {
+                //The user is ready to start drawing, needs to send these points as world space
+                startLineDraw(touchLoc);
+            }
+        }
+    } else if(e.touches.length === 2){
+        if(touchPoints === 0){
+            gesturing = true;
+        }
+        touchPoints = 2;
+        var gesturePoint1 = convertLocalToCanvasSpace({
+            x : e.touches[0].pageX,
+            y : e.touches[0].pageY
+        });
+        var gesturePoint2 = convertLocalToCanvasSpace({
+            x : e.touches[1].pageX,
+            y : e.touches[1].pageY
+        });
+        gestureStart(gesturePoint1, gesturePoint2, !gesturing);
+        gesturing = true;
+    }
+});
+var touchPosition = {
+    x : 0,
+    y : 0
+};
+canvas.addEventListener("touchmove", function(e){
+    e.preventDefault();
+    if(e.touches.length === 1){
+        var touchLoc = {x : e.touches[0].pageX, y : e.touches[0].pageY};
+        touchPosition = touchLoc;
+        if(!gesturing){
+            //Only one finger on the screen, do the thing
+            lineDraw(convertLocalToWorldSpace(touchLoc));
+        } else {
+            //More than one finger on the screen
+            var gesturePoint1 = convertLocalToCanvasSpace({
+                x : e.touches[0].pageX,
+                y : e.touches[0].pageY
+            });
+            var gesturePoint2 = convertLocalToCanvasSpace({
+                x : e.touches[1].pageX,
+                y : e.touches[1].pageY
+            });
+            gestureDrag(gesturePoint1, gesturePoint2);
+        }
+    }
+});
+canvas.addEventListener("touchend", function(e){
+    touchPoints = e.touches.length;
+    if(touchPoints === 0){
+        gesturing = false;
+        stopLineDraw(convertLocalToWorldSpace(touchPosition));
+    }
+});
+var gesture = {};
+function gestureStart(point1, point2, first){
+    if(first){
+        cancelDraw();
+    }
+    gesture.viewport = clone(viewport);
+    gesture.start = point1;
+    gesture.end = point2;
+    gesture.average = {
+        x : (point1.x+point2.x) / 2,
+        y : (point1.y+point2.y) / 2
+    };
+    gesture.averageWorld = convertCanvasToWorldSpace(gesture.average);
+    gesture.distance = Math.sqrt((point2.x - point1.x) * (point2.x - point1.x)+(point2.y - point1.y) * (point2.y - point1.y));
+}
+function gestureDrag(point1, point2){
+    //Get the average position of the drag
+    var avgX = (point1.x + point2.x) / 2;
+    var avgY = (point1.y + point2.y) / 2;
+    //Get the distance of the drag - and they said I'd never use the distance formula in real life...
+    var distance = Math.sqrt((point2.x - point1.x) * (point2.x - point1.x) + (point2.y - point1.y) * (point2.y - point1.y));
+    viewport.scale = gesture.viewport.scale * (distance / gesture.distance);
+    //Reset the offsets from the gesture to the actual viewport
+    viewport.x = gesture.viewport.x;
+    viewport.y = gesture.viewport.y;
+    var currentPos = convertWorldToCanvasSpace(gesture.averageWorld);
+    var newPos = {x : avgX, y : avgY};
+    //Convert the gesture delta to the viewport
+    viewport.x = newPos.x - currentPos.x;
+    viewport.y = newPos.y - currentPos.y;
+    redrawCanvas();
+}
 window.onkeydown = function(e){
     //Control all the key events
     var key = e.which;
@@ -223,6 +326,14 @@ function stopLineDraw(loc){
     drawConn.send(JSON.stringify(cmd));
 }
 
+function cancelDraw(){
+    //Probably tryna gesture or something and got a bad line start, not a huge deal
+    var cmd = {
+        type : "cancel-path"
+    };
+    drawConn.send(JSON.stringify(cmd));
+}
+
 var textToolOpen = false;
 
 //Toggle the text tool
@@ -272,7 +383,6 @@ function toggleImageTool(point){
     }
 }
 
-//TODO: combine the redraw tool functions maybe?
 function redrawImageTool(point){
     //Reposition the image tool to be where the user clicked
     var imageTool = $('#image-tool');
@@ -386,6 +496,10 @@ function handleCommand(e){
             isDrawn : true
         };
         sendingClient.paths.push(imageToolRecord);
+    } else if("cancel-path"){
+        sendingClient = clients[drawCmd.id];
+        sendingClient.paths.pop();
+        redrawCanvas();
     }
 }
 
