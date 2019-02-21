@@ -784,7 +784,7 @@ $('.tool-option').click(function(){
         toggleImageTool({x : 0, y : 0});
     }
     //Close the entire toolbox
-    if(screen.width <= 768){
+    if(window.innerWidth <= 768){
         toggleToolBoxOpen();
     }
 });
@@ -824,7 +824,7 @@ function toggleEditMenu(loc){
         toolEditMenu.css("display", "block");
         contextMenu.css("display", "block");
         contextMenu.find(".tool-edit-option").css("display", "block");
-        if(screen.width >= 768){
+        if(window.innerWidth >= 768){
             redrawEditMenu(loc);
         }
         toolEditMenuOpen = true;

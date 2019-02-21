@@ -27,6 +27,9 @@ class Draw implements MessageComponentInterface{
     public function onMessage(ConnectionInterface $from, $msg){
         //Open the command
         $msg = json_decode($msg);
+        if($msg->type == "end-path"){
+            handleLineCommit($msg->lineData);
+        }
         //add the sender id
         $msg->id = $from->resourceId;
         //Close the command

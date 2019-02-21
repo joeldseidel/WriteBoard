@@ -116,6 +116,7 @@ body{
     left : 0;
     background-color:  rgba(0,0,0,0.75);
     border-bottom-right-radius: 10px;
+    cursor: pointer;
 }
 
 .tool-option{
@@ -163,6 +164,7 @@ body{
     color: white;
     padding: 10px;
     border-bottom-left-radius: 10px;
+    cursor: pointer;
 }
 
 .tool-edit-option{
@@ -271,8 +273,10 @@ body{
         width: 100%;
         border-radius: 0;
     }
-    #tool-edit-menu{
-        width: 100%;
-        border-radius: 0;
+    #mobile-context{
+        display: block;
+    }
+    #mobile-tool-box{
+        display: block;
     }
 }

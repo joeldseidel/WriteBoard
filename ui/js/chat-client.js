@@ -13,19 +13,18 @@ chatConn.onopen = function(){
 chatConn.onmessage = function(e){
     formatChatMessage(e);
 };
-
+if(window.innerWidth <= 768){
+    //Start with mini chat open and big chat closed
+    //Show the mobile drawing menus
+    $('#mobile-tool-box').css("display", "block");
+    $('#mobile-context').css("display", "block");
+    chatShown = false;
+}
 $(document).ready(function(){
     var sendChatButton = $('#send-chat-button');
     var chatInput = $('#chat-input');
     var minChat = $('#close-chat-button');
     var openChat = $('#open-chat');
-    if(screen.width <= 768){
-        //Start with mini chat open and big chat closed
-        //Show the mobile drawing menus
-        $('#mobile-tool-box').css("display", "block");
-        $('#mobile-context').css("display", "block");
-        chatShown = false;
-    }
     chatInput.keypress(function (e) {
         var key = e.which;
         if(key === 13){
@@ -45,7 +44,7 @@ $(document).ready(function(){
         var minichat = $('#mini-chat');
         chat.slideToggle();
         minichat.css("display", "block");
-        if(screen.width <= 768){
+        if(window.innerWidth <= 768){
             //Show the mobile drawing menus
             $('#mobile-tool-box').css("display", "block");
             $('#mobile-context').css("display", "block");
