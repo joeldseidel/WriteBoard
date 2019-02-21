@@ -259,7 +259,7 @@ $('#enter-text-tool').click(function(){
         //Nothing is in the text box, do nothing
         return;
     }
-    var relSize = tool.size / viewport.scale * 5;
+    var relSize = tool.size * 5 / viewport.scale;
     var point = convertLocalToWorldSpace({
         x : textTool.position().left,
         y : textTool.position().top
@@ -409,7 +409,6 @@ function redrawCanvas(){
             }
         });
     });
-    context.restore();
 }
 
 function calcRedrawOrder(){
@@ -423,21 +422,25 @@ function doRedraw(path){
     if (path.path.type === "text"){
         context.font = path.path.size.toString() + 'px ' + path.path.font.toString();
         context.fillStyle = path.path.color;
-        var point = convertWorldToCanvasSpace(path.path.point);
+        var point = path.path.point;
         context.fillText(path.path.val, point.x, point.y);
         context.stroke();
         currentEntityCounter++;
         if(entities[currentEntityCounter]){
             doRedraw(entities[currentEntityCounter]);
+        } else {
+            context.restore();
         }
     } else if (path.path.type === "image"){
         var thisImage = new Image();
         thisImage.onload = function(){
-            var point = convertWorldToCanvasSpace(path.path.point);
-            context.drawImage(thisImage, point.x, point.y, thisImage.width * viewport.scale, thisImage.height * viewport.scale);
+            var point = path.path.point;
+            context.drawImage(thisImage, point.x, point.y, thisImage.width, thisImage.height);
             currentEntityCounter++;
             if(entities[currentEntityCounter]){
                 doRedraw(entities[currentEntityCounter]);
+            } else {
+                context.restore();
             }
         };
         thisImage.src = path.path.data;
@@ -449,13 +452,11 @@ function doRedraw(path){
         context.lineWidth = path.path.size;
         context.lineCap = 'round';
         path.path.points.forEach(function(point, i){
-            point = convertWorldToCanvasSpace(point);
             if(i === 0){
                 //This is the first point in this line
                 context.moveTo(point.x + 0.5, point.y + 0.5);
             } else {
                 var lastPoint = path.path.points[i - 1];
-                lastPoint = convertWorldToCanvasSpace(lastPoint);
                 context.moveTo(lastPoint.x + 0.5, lastPoint.y + 0.5);
             }
             context.lineTo(point.x, point.y);
@@ -464,6 +465,8 @@ function doRedraw(path){
         currentEntityCounter++;
         if(entities[currentEntityCounter]){
             doRedraw(entities[currentEntityCounter]);
+        } else {
+            context.restore();
         }
     }
 }
