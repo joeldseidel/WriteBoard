@@ -12,6 +12,10 @@ public class AddPathHandler extends HandlerPrototype implements HttpHandler {
     @Override
     protected void fulfillRequest(JSONObject requestParams) {
         //Enqueue the line object and return successfully
-        PathListener.commitQueue.add(requestParams.toString());
+        try{
+            PathListener.commitQueue.put(requestParams.toString());
+        } catch (InterruptedException iEx) {
+            iEx.printStackTrace();
+        }
     }
 }

@@ -7,3 +7,6 @@ api/out/production/api/main/WriteboardData.class
 api/out/production/api/main/Managers/PathListener.class
 api/out/production/api/main/Handlers/HandlerPrototype.class
 api/out/production/api/main/Handlers/AddPathHandler.class
+api/out/production/api/mysql-connector-java-5.1.46.jar
+api/out/production/api/main/Managers/Database/DatabaseInteraction.class
+api/out/production/api/main/Managers/Database/database.properties

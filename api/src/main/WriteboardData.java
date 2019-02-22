@@ -1,11 +1,8 @@
 package main;
 
-import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import main.Handlers.AddPathHandler;
-import main.Handlers.HandlerPrototype;
 import main.Managers.PathListener;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
