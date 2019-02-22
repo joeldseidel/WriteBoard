@@ -39,9 +39,13 @@ class Draw implements MessageComponentInterface{
         if($msg->type == "close-path"){
             $this->commitToData($msg->lineData);
         } else if($msg->type == "new-text"){
-            $this->commitToData($msg->props);
+            $text_data = new \stdClass();
+            $text_data->path = $msg->props;
+            $this->commitToData($text_data);
         } else if($msg->type == "new-image"){
-            $this->commitToData($msg->props);
+            $img_data = new \stdClass();
+            $img_data->path = $msg->props;
+            $this->commitToData($img_data);
         }
         //Send the command to connected clients
         $this->sendMessage($msg);

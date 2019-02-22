@@ -28,5 +28,6 @@ public class GetArtifactsHandler extends HandlerPrototype implements HttpHandler
             sqlEx.printStackTrace();
         }
         this.response = artifactArray.toString();
+        database.closeConnection();
     }
 }

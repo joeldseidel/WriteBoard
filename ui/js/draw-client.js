@@ -22,8 +22,7 @@ var clients = [];
 var artifacts = [];
 //My client id
 var me = -1;
-//var drawConn = new WebSocket("ws://18.191.68.244:8282/draw");
-var drawConn = new WebSocket("ws://localhost:8282/draw");
+var drawConn = new WebSocket("ws://18.191.68.244:8282/draw");
 
 var toolEditMenuOpen = false;
 
@@ -219,23 +218,25 @@ function gestureDrag(point1, point2){
 window.onkeydown = function(e){
     //Control all the key events
     var key = e.which;
-    if(key >= 37 && key <= 40){
-        //One of the arrow keys down
-        handleCanvasPan(key);
-    }
-    if(key === 67){
-        //C key down
-        handleRecenter();
-    }
-    //If user is pressing the e key and they aren't drawing
-    if(key === 69 && !mouseDown && !textToolOpen){
-        //Macs are stupid and cant use the right click so here is a keyboard shortcut
-        if(toolEditMenuOpen){
-            //User is right clicking again, must want to move the position of the edit tool menu
-            redrawEditMenu(mousePoint);
-        } else {
-            //User is right clicking without the menu open, must want to open it
-            toggleEditMenu(mousePoint);
+    if(!mouseDown && !textToolOpen){
+        if(key >= 37 && key <= 40){
+            //One of the arrow keys down
+            handleCanvasPan(key);
+        }
+        if(key === 67){
+            //C key down
+            handleRecenter();
+        }
+        //If user is pressing the e key and they aren't drawing
+        if(key === 69){
+            //Macs are stupid and cant use the right click so here is a keyboard shortcut
+            if(toolEditMenuOpen){
+                //User is right clicking again, must want to move the position of the edit tool menu
+                redrawEditMenu(mousePoint);
+            } else {
+                //User is right clicking without the menu open, must want to open it
+                toggleEditMenu(mousePoint);
+            }
         }
     }
 };
@@ -386,6 +387,7 @@ function toggleTextTool(point, isRedraw){
             //User wants the text entry box gone
             textTool.css("display", "none");
             textEntry.css("display", "none");
+            textEntry.val('');
             textToolOpen = false;
         }
     }
@@ -575,12 +577,14 @@ function redrawCanvas(){
     context.save();
     context.translate(-viewport.x, viewport.y);
     context.scale(viewport.scale, viewport.scale);
-    for(var i = 0; i < artifacts.length; i++){
-        var artifact = JSON.parse(artifacts[i]);
-        if(!artifact){
-            continue;
+    if(artifacts){
+        for(var i = 0; i < artifacts.length; i++){
+            var artifact = JSON.parse(artifacts[i]);
+            if(!artifact){
+                continue;
+            }
+            entities.push(artifact);
         }
-        entities.push(artifact);
     }
     for(var i = 0; i < clients.length; i++){
         //Clients loop
