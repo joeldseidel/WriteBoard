@@ -85,4 +85,4 @@ The other noteworthy commands is the socket handshake process. The socket handsh
    
 We hope you enjoy WriteBoard!
 
-Feel free to contact [me](joelseidel.com) with any questions regarding the application.
+Feel free to contact [me](www.joelseidel.com) with any questions regarding the application.
