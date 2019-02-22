@@ -256,6 +256,7 @@ body{
 }
 
 #main-title{
+    font-family: 'Roboto', sans-serif;
     text-align: center;
 }
 
@@ -279,4 +280,11 @@ body{
     #mobile-tool-box{
         display: block;
     }
+}
+
+#enterForm{
+    padding: 10px;
+}
+#username{
+    margin-bottom: 20px;
 }
