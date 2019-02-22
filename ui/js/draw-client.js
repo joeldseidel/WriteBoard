@@ -575,6 +575,13 @@ function redrawCanvas(){
     context.save();
     context.translate(-viewport.x, viewport.y);
     context.scale(viewport.scale, viewport.scale);
+    for(var i = 0; i < artifacts.length; i++){
+        var artifact = JSON.parse(artifacts[i]);
+        if(!artifact){
+            continue;
+        }
+        entities.push(artifact);
+    }
     for(var i = 0; i < clients.length; i++){
         //Clients loop
         var client = clients[i];

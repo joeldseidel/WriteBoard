@@ -25,7 +25,7 @@ class Draw implements MessageComponentInterface{
         $welcomeMsg->type = "welcome";
         $welcomeMsg->friendsHere = $connectedIds;
         $welcomeMsg->me = $conn->resourceId;
-        $this->sendMessage(json_encode($welcomeMsg));
+        $this->sendMessage($welcomeMsg);
         $artifactHandshake = new \stdClass();
         $artifactHandshake->artifacts = $this->getArtifacts();
         $artifactHandshake->type = "artifact-handshake";
