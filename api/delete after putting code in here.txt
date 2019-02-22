@@ -1,0 +1,6 @@
+I had to put a file in here to make the git client realize that the directory
+needed to be committed.
+
+It can be deleted whenever.
+
+-Joel
