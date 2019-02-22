@@ -1,3 +1,9 @@
 .idea/
+.api/out/
 index.php___jb_tmp___
 api/api.iml
+api/out/production/api/json-20140107.jar
+api/out/production/api/main/WriteboardData.class
+api/out/production/api/main/Managers/PathListener.class
+api/out/production/api/main/Handlers/HandlerPrototype.class
+api/out/production/api/main/Handlers/AddPathHandler.class

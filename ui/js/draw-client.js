@@ -20,7 +20,8 @@ var mousePoint = {
 var clients = [];
 //My client id
 var me = -1;
-var drawConn = new WebSocket("ws://18.191.68.244:8282/draw");
+//var drawConn = new WebSocket("ws://18.191.68.244:8282/draw");
+var drawConn = new WebSocket("ws://localhost:8282/draw");
 
 var toolEditMenuOpen = false;
 

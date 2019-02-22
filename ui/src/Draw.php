@@ -2,6 +2,7 @@
 namespace TeamFour;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
+use Exception;
 
 class Draw implements MessageComponentInterface{
     protected $clients;
@@ -31,7 +32,7 @@ class Draw implements MessageComponentInterface{
         //add the sender id
         $msg->id = $from->resourceId;
         if($msg->type == "close-path"){
-            //$this->handleLineCommit($msg);
+            $this->handleLineCommit($msg);
         }
         //Close the command
         $msg = json_encode($msg);
@@ -52,18 +53,25 @@ class Draw implements MessageComponentInterface{
     }
     public function handleLineCommit($commitMsg){
         $lineData = new \stdClass();
+        var_dump($commitMsg);
         $lineData->data = $commitMsg->lineData;
         $lineData->id = $commitMsg->id;
-        //TODO:figure out what is wrong with this mess
+        $lineJson = json_encode($lineData);
         try{
-            $api_url = "18.191.68.244:6869";
             //TODO make the http request
-            $ch = curl_init($api_url);
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, "http://localhost/add-path");
+            curl_setopt($ch, CURLOPT_PORT, 6869);
             curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($lineData));
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $lineJson);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            $response = null;
-                $response = curl_exec($ch);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 100);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
+            $response = curl_exec($ch);
+            echo curl_error($ch);
+            curl_close($ch);
+            echo $response;
         } catch(Exception $e){
             echo $e->getMessage();
         }
