@@ -18,12 +18,12 @@ public class PathListener {
             while(true){
                 try{
                     //Get the next committed line from the queue
-                    Object nextPathObj = commitQueue.take();
+                    String nextPathObj = commitQueue.take();
                     if(nextPathObj != null){
                         String insertLineSql = "INSERT INTO entities(entity_data) VALUES (?)";
                         PreparedStatement insertLineStmt = database.prepareStatement(insertLineSql);
                         try{
-                            insertLineStmt.setString(1, nextPathObj.toString());
+                            insertLineStmt.setString(1, nextPathObj);
                         } catch (SQLException sqlEx) {
                             sqlEx.printStackTrace();
                         }

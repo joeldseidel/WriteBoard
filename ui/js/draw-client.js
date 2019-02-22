@@ -18,8 +18,12 @@ var mousePoint = {
 
 //Used for drawing
 var clients = [];
+//Things that are already drawm that are coming from back end data
+var artifacts = [];
 //My client id
 var me = -1;
+//My current room
+var room = getRoomParam();
 //var drawConn = new WebSocket("ws://18.191.68.244:8282/draw");
 var drawConn = new WebSocket("ws://localhost:8282/draw");
 
@@ -31,8 +35,13 @@ var viewport = {
     scale : 1
 };
 
+function getRoomParam(){
+    var roomParam = window.location.search.replace("?", '');
+    roomParam = roomParam.replace("room=", '');
+    return roomParam;
+}
+
 drawConn.onopen = function(){
-    //TODO: get already existing paths and points
     var openArgs = { type : "new-client" };
     drawConn.send(JSON.stringify(openArgs));
 };
@@ -294,12 +303,12 @@ function startLineDraw(loc){
     if(tool.type === "pen"){
         //Start a new pen drawing path
         loc = convertLocalToWorldSpace(loc);
-        thisLine = { color : tool.color, size: relSize, points: [], type: 'pen'};
+        thisLine = { timestamp : new Date().getTime(), color : tool.color, size: relSize, points: [], type: 'pen'};
         emitNewLine(thisLine, loc);
     } else if(tool.type === "eraser") {
         //Start a new eraser drawing path
         loc = convertLocalToWorldSpace(loc);
-        thisLine = { color : '#ffffff', size: relSize, points: [], type: 'eraser'};
+        thisLine = { timestamp : new Date().getTime(), color : '#ffffff', size: relSize, points: [], type: 'eraser'};
         emitNewLine(thisLine, loc);
     } else if(tool.type === "text"){
         toggleTextTool(loc);
@@ -310,7 +319,7 @@ function startLineDraw(loc){
 
 function emitNewLine(thisLine, loc){
     //Add the current point to the path array
-    var cmd = {type : "new-path", timestamp : new Date().getTime(), path : thisLine};
+    var cmd = {type : "new-path", path : thisLine};
     //Announce that there is a new path
     drawConn.send(JSON.stringify(cmd));
     cmd = {type: "update-draw", point: loc};
@@ -435,10 +444,9 @@ $('#enter-text-tool').click(function(){
         x : textTool.position().left,
         y : textTool.position().top
     });
-    var props = {color : tool.color, size : relSize, font : tool.font, type: 'text', point : point, val : textInput};
+    var props = {timestamp : new Date().getTime(), color : tool.color, size : relSize, font : tool.font, type: 'text', point : point, val : textInput};
     var cmd = {
         type : "new-text",
-        timestamp : new Date().getTime(),
         props : props
     };
     drawConn.send(JSON.stringify(cmd));
@@ -456,10 +464,9 @@ $('#upload-image-button').click(function(){
             x: imageTool.position().left,
             y: imageTool.position().top
         });
-        var props = {color: tool.color, size: relSize, type: "image", point: point, data: image};
+        var props = {timestamp : new Date().getTime(), color: tool.color, size: relSize, type: "image", point: point, data: image};
         var cmd = {
             type : "new-image",
-            timestamp : new Date().getTime(),
             props : props
         };
         drawConn.send(JSON.stringify(cmd));
@@ -524,9 +531,12 @@ function handleCommand(e){
             isDrawn : true
         };
         sendingClient.paths.push(imageToolRecord);
-    } else if("cancel-path"){
+    } else if(drawCmd.type === "cancel-path"){
         sendingClient = clients[drawCmd.id];
         sendingClient.paths.pop();
+        redrawCanvas();
+    } else if(drawCmd.type === "artifact-handshake"){
+        artifacts = drawCmd.artifacts;
         redrawCanvas();
     }
 }

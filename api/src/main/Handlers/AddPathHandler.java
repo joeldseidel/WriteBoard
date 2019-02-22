@@ -6,7 +6,7 @@ import org.json.JSONObject;
 
 public class AddPathHandler extends HandlerPrototype implements HttpHandler {
     public AddPathHandler(){
-        requiredKeys = new String[]{"data", "id"};
+        requiredKeys = new String[]{};
         handlerName = "Add Path Handler";
     }
     @Override
@@ -14,7 +14,7 @@ public class AddPathHandler extends HandlerPrototype implements HttpHandler {
         //Enqueue the line object and return successfully
         try{
             PathListener.commitQueue.put(requestParams.toString());
-        } catch (InterruptedException iEx) {
+        } catch(InterruptedException iEx){
             iEx.printStackTrace();
         }
     }

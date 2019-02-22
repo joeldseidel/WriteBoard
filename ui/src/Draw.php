@@ -20,11 +20,14 @@ class Draw implements MessageComponentInterface{
         foreach($this->connectedUsers as $user){
             array_push($connectedIds, $user->resourceId);
         }
+        //Create the client welcome hand shake
         $welcomeMsg = new \stdClass();
         $welcomeMsg->type = "welcome";
         $welcomeMsg->friendsHere = $connectedIds;
         $welcomeMsg->me = $conn->resourceId;
         $this->sendMessage(json_encode($welcomeMsg));
+        $artifactHandshake = new \stdClass();
+        $artifactHandshake->artifacts = $this->getArtifacts();
     }
     public function onMessage(ConnectionInterface $from, $msg){
         //Open the command
@@ -32,7 +35,11 @@ class Draw implements MessageComponentInterface{
         //add the sender id
         $msg->id = $from->resourceId;
         if($msg->type == "close-path"){
-            $this->handleLineCommit($msg);
+            $this->commitToData($msg->lineData);
+        } else if($msg->type == "new-text"){
+            $this->commitToData($msg->props);
+        } else if($msg->type == "new-image"){
+            $this->commitToData($msg->props);
         }
         //Close the command
         $msg = json_encode($msg);
@@ -40,6 +47,7 @@ class Draw implements MessageComponentInterface{
         $this->sendMessage($msg);
     }
     private function sendMessage($message){
+        //This goes to all user's regardless of room
         foreach($this->connectedUsers as $user){
             $user->send(json_encode($message));
         }
@@ -51,27 +59,41 @@ class Draw implements MessageComponentInterface{
     public function onError(ConnectionInterface $conn, \Exception $e){
         echo "Error occurred :[   ERROR MESSAGE: {$e->getMessage()}\n";
     }
-    public function handleLineCommit($commitMsg){
-        $lineData = new \stdClass();
-        var_dump($commitMsg);
-        $lineData->data = $commitMsg->lineData;
-        $lineData->id = $commitMsg->id;
-        $lineJson = json_encode($lineData);
+    private function commitToData($data){
+        $data = json_encode($data);
         try{
-            //TODO make the http request
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, "http://localhost/add-path");
             curl_setopt($ch, CURLOPT_PORT, 6869);
             curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $lineJson);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_TIMEOUT, 100);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
-            $response = curl_exec($ch);
+            curl_exec($ch);
+            curl_close($ch);
+        } catch(Exception $e){
+            echo $e->getMessage();
+        }
+    }
+    private function getArtifacts(){
+        try{
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, "http://localhost/get-artifacts");
+            curl_setopt($ch, CURLOPT_PORT, 6869);
+            curl_setopt($ch, CURLOPT_POST, 1);
+            //Give is a dummy payload to fool the server into not dropping the packet
+            $payload = new \stdClass();
+            $payload->content = "joel is neat";
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 100);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
+            curl_exec($ch);
             echo curl_error($ch);
             curl_close($ch);
-            echo $response;
         } catch(Exception $e){
             echo $e->getMessage();
         }

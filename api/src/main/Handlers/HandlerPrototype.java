@@ -65,7 +65,6 @@ public abstract class HandlerPrototype {
                 return false;
             }
         }
-        System.out.println("Valid request");
         return true;
     }
 

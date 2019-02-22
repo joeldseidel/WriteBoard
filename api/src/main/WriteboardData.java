@@ -2,6 +2,7 @@ package main;
 
 import com.sun.net.httpserver.HttpServer;
 import main.Handlers.AddPathHandler;
+import main.Handlers.GetArtifactsHandler;
 import main.Managers.PathListener;
 
 import java.io.IOException;
@@ -24,6 +25,7 @@ public class WriteboardData {
             HttpServer server;
             server = HttpServer.create(new InetSocketAddress(6869), 0);
             server.createContext("/add-path", new AddPathHandler());
+            server.createContext("/get-artifacts", new GetArtifactsHandler());
             server.start();
         } catch (IOException ioEx) {
             //In my years of working with Java HTTP/s, never once have I encountered this
