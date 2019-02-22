@@ -1,7 +1,11 @@
 package main;
 
+import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import main.Handlers.AddPathHandler;
+import main.Handlers.HandlerPrototype;
+import main.Managers.PathListener;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -17,6 +21,7 @@ public class WriteboardData {
      * @param args because java
      */
     public static void main(String args[]){
+        PathListener.startListener();
         //Create http server
         try{
             HttpServer server;
@@ -28,6 +33,5 @@ public class WriteboardData {
             //But it's here to shut IntelliJ up
             ioEx.printStackTrace();
         }
-        //TODO: start the worker thread to process the queue
     }
 }

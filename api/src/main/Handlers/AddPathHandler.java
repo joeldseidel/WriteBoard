@@ -1,6 +1,7 @@
 package main.Handlers;
 
 import com.sun.net.httpserver.HttpHandler;
+import main.Managers.PathListener;
 import org.json.JSONObject;
 
 public class AddPathHandler extends HandlerPrototype implements HttpHandler {
@@ -10,6 +11,7 @@ public class AddPathHandler extends HandlerPrototype implements HttpHandler {
     }
     @Override
     protected void fulfillRequest(JSONObject requestParams) {
-        //TODO: enqueue this object string so that the other thread can put it in the database
+        //Enqueue the line object and return successfully
+        PathListener.commitQueue.add(requestParams.toString());
     }
 }
