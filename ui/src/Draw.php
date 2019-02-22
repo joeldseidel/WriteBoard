@@ -28,6 +28,8 @@ class Draw implements MessageComponentInterface{
         $this->sendMessage(json_encode($welcomeMsg));
         $artifactHandshake = new \stdClass();
         $artifactHandshake->artifacts = $this->getArtifacts();
+        $artifactHandshake->type = "artifact-handshake";
+        $conn->send(json_encode($artifactHandshake));
     }
     public function onMessage(ConnectionInterface $from, $msg){
         //Open the command
@@ -41,8 +43,6 @@ class Draw implements MessageComponentInterface{
         } else if($msg->type == "new-image"){
             $this->commitToData($msg->props);
         }
-        //Close the command
-        $msg = json_encode($msg);
         //Send the command to connected clients
         $this->sendMessage($msg);
     }
@@ -91,9 +91,9 @@ class Draw implements MessageComponentInterface{
             curl_setopt($ch, CURLOPT_TIMEOUT, 100);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
-            curl_exec($ch);
-            echo curl_error($ch);
+            $artifacts = curl_exec($ch);
             curl_close($ch);
+            return json_decode($artifacts);
         } catch(Exception $e){
             echo $e->getMessage();
         }

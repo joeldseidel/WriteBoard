@@ -22,8 +22,6 @@ var clients = [];
 var artifacts = [];
 //My client id
 var me = -1;
-//My current room
-var room = getRoomParam();
 //var drawConn = new WebSocket("ws://18.191.68.244:8282/draw");
 var drawConn = new WebSocket("ws://localhost:8282/draw");
 
@@ -34,12 +32,6 @@ var viewport = {
     y : 0,
     scale : 1
 };
-
-function getRoomParam(){
-    var roomParam = window.location.search.replace("?", '');
-    roomParam = roomParam.replace("room=", '');
-    return roomParam;
-}
 
 drawConn.onopen = function(){
     var openArgs = { type : "new-client" };
@@ -480,7 +472,7 @@ $('#upload-image-button').click(function(){
 });
 
 function handleCommand(e){
-    var drawCmd = JSON.parse(JSON.parse(e));
+    var drawCmd = JSON.parse(e);
     var sendingClient;
     if(drawCmd.type === "new-path"){
         //Get the client corresponding to the sending client

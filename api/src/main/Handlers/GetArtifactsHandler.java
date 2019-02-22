@@ -16,7 +16,7 @@ public class GetArtifactsHandler extends HandlerPrototype implements HttpHandler
     @Override
     protected void fulfillRequest(JSONObject requestParams){
         DatabaseInteraction database = new DatabaseInteraction();
-        String getArtifactsSql = "SELECT entity_data FROM entities";
+        String getArtifactsSql = "SELECT entity_data FROM entities LIMIT 100";
         PreparedStatement getArtifactsStmt = database.prepareStatement(getArtifactsSql);
         ResultSet artifactsResult = database.query(getArtifactsStmt);
         JSONArray artifactArray = new JSONArray();

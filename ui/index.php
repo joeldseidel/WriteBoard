@@ -14,8 +14,6 @@
             <form id="enterForm">
                 <label for="username">Enter a username:</label>
                 <input type="text" id="username">
-                <label for="room">Enter a Room ID:</label>
-                <input type="text" id="room">
                 <button type="button" id="submitUsername">Enter the workspace</button>
             </form>
         </div>
@@ -26,8 +24,7 @@
         $(document).ready(function(){
             $('#submitUsername').click(function(){
                 var username = $('#username').val();
-                var room = $('#room').val();
-                window.location.href = "drawingview.php?username=" + username + "?room=" + room;
+                window.location.href = "drawingview.php?username=" + username;
             });
         });
     </script>
